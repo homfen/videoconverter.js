@@ -9,11 +9,11 @@
 ##  be found in the AUTHORS file in the root of the source tree.
 ##
 
-
 self=$0
 self_basename=${self##*/}
 self_dirname=$(dirname "$0")
-EOL=$'\n'
+
+. "$self_dirname/msvs_common.sh"|| exit 127
 
 show_help() {
     cat <<EOF
@@ -34,7 +34,7 @@ Options:
     --name=project_name         Name of the project (required)
     --proj-guid=GUID            GUID to use for the project
     --module-def=filename       File containing export definitions (for DLLs)
-    --ver=version               Version (10,11,12) of visual studio to generate for
+    --ver=version               Version (14-16) of visual studio to generate for
     --src-path-bare=dir         Path to root of source tree
     -Ipath/to/include           Additional include directories
     -DFLAG[=value]              Preprocessor macros to define
@@ -42,82 +42,6 @@ Options:
     -llibname                   Library to link against
 EOF
     exit 1
-}
-
-die() {
-    echo "${self_basename}: $@" >&2
-    exit 1
-}
-
-die_unknown(){
-    echo "Unknown option \"$1\"." >&2
-    echo "See ${self_basename} --help for available options." >&2
-    exit 1
-}
-
-generate_uuid() {
-    local hex="0123456789ABCDEF"
-    local i
-    local uuid=""
-    local j
-    #93995380-89BD-4b04-88EB-625FBE52EBFB
-    for ((i=0; i<32; i++)); do
-        (( j = $RANDOM % 16 ))
-        uuid="${uuid}${hex:$j:1}"
-    done
-    echo "${uuid:0:8}-${uuid:8:4}-${uuid:12:4}-${uuid:16:4}-${uuid:20:12}"
-}
-
-indent1="    "
-indent=""
-indent_push() {
-    indent="${indent}${indent1}"
-}
-indent_pop() {
-    indent="${indent%${indent1}}"
-}
-
-tag_attributes() {
-    for opt in "$@"; do
-        optval="${opt#*=}"
-        [ -n "${optval}" ] ||
-            die "Missing attribute value in '$opt' while generating $tag tag"
-        echo "${indent}${opt%%=*}=\"${optval}\""
-    done
-}
-
-open_tag() {
-    local tag=$1
-    shift
-    if [ $# -ne 0 ]; then
-        echo "${indent}<${tag}"
-        indent_push
-        tag_attributes "$@"
-        echo "${indent}>"
-    else
-        echo "${indent}<${tag}>"
-        indent_push
-    fi
-}
-
-close_tag() {
-    local tag=$1
-    indent_pop
-    echo "${indent}</${tag}>"
-}
-
-tag() {
-    local tag=$1
-    shift
-    if [ $# -ne 0 ]; then
-        echo "${indent}<${tag}"
-        indent_push
-        tag_attributes "$@"
-        indent_pop
-        echo "${indent}/>"
-    else
-        echo "${indent}<${tag}/>"
-    fi
 }
 
 tag_content() {
@@ -154,15 +78,17 @@ generate_filter() {
             if [ "${f##*.}" == "$pat" ]; then
                 unset file_list[i]
 
-                objf=$(echo ${f%.*}.obj | sed -e 's/^[\./]\+//g' -e 's,/,_,g')
+                objf=$(echo ${f%.*}.obj \
+                       | sed -e "s,$src_path_bare,," \
+                             -e 's/^[\./]\+//g' -e 's,[:/ ],_,g')
 
-                if ([ "$pat" == "asm" ] || [ "$pat" == "s" ]) && $asm_use_custom_step; then
+                if ([ "$pat" == "asm" ] || [ "$pat" == "s" ] || [ "$pat" == "S" ]) && $uses_asm; then
                     # Avoid object file name collisions, i.e. vpx_config.c and
                     # vpx_config.asm produce the same object file without
                     # this additional suffix.
                     objf=${objf%.obj}_asm.obj
                     open_tag CustomBuild \
-                        Include=".\\$f"
+                        Include="$f"
                     for plat in "${platforms[@]}"; do
                         for cfg in Debug Release; do
                             tag_content Message "Assembling %(Filename)%(Extension)" \
@@ -177,7 +103,7 @@ generate_filter() {
                 elif [ "$pat" == "c" ] || \
                      [ "$pat" == "cc" ] || [ "$pat" == "cpp" ]; then
                     open_tag ClCompile \
-                        Include=".\\$f"
+                        Include="$f"
                     # Separate file names with Condition?
                     tag_content ObjectFileName "\$(IntDir)$objf"
                     # Check for AVX and turn it on to avoid warnings.
@@ -187,7 +113,7 @@ generate_filter() {
                     close_tag ClCompile
                 elif [ "$pat" == "h" ] ; then
                     tag ClInclude \
-                        Include=".\\$f"
+                        Include="$f"
                 elif [ "$pat" == "vcxproj" ] ; then
                     open_tag ProjectReference \
                         Include="$f"
@@ -197,7 +123,7 @@ generate_filter() {
                     close_tag ProjectReference
                 else
                     tag None \
-                        Include=".\\$f"
+                        Include="$f"
                 fi
 
                 break
@@ -231,7 +157,9 @@ for opt in "$@"; do
         ;;
         --lib) proj_kind="lib"
         ;;
-        --src-path-bare=*) src_path_bare="$optval"
+        --src-path-bare=*)
+            src_path_bare=$(fix_path "$optval")
+            src_path_bare=${src_path_bare%/}
         ;;
         --static-crt) use_static_runtime=true
         ;;
@@ -240,27 +168,31 @@ for opt in "$@"; do
         --ver=*)
             vs_ver="$optval"
             case "$optval" in
-                10|11|12)
+                1[4-6])
                 ;;
                 *) die Unrecognized Visual Studio Version in $opt
                 ;;
             esac
         ;;
         -I*)
+            opt=${opt##-I}
+            opt=$(fix_path "$opt")
             opt="${opt%/}"
-            incs="${incs}${incs:+;}${opt##-I}"
-            yasmincs="${yasmincs} ${opt}"
+            incs="${incs}${incs:+;}&quot;${opt}&quot;"
+            yasmincs="${yasmincs} -I&quot;${opt}&quot;"
         ;;
         -D*) defines="${defines}${defines:+;}${opt##-D}"
         ;;
         -L*) # fudge . to $(OutDir)
             if [ "${opt##-L}" == "." ]; then
-                libdirs="${libdirs}${libdirs:+;}\$(OutDir)"
+                libdirs="${libdirs}${libdirs:+;}&quot;\$(OutDir)&quot;"
             else
                  # Also try directories for this platform/configuration
-                 libdirs="${libdirs}${libdirs:+;}${opt##-L}"
-                 libdirs="${libdirs}${libdirs:+;}${opt##-L}/\$(PlatformName)/\$(Configuration)"
-                 libdirs="${libdirs}${libdirs:+;}${opt##-L}/\$(PlatformName)"
+                 opt=${opt##-L}
+                 opt=$(fix_path "$opt")
+                 libdirs="${libdirs}${libdirs:+;}&quot;${opt}&quot;"
+                 libdirs="${libdirs}${libdirs:+;}&quot;${opt}/\$(PlatformName)/\$(Configuration)&quot;"
+                 libdirs="${libdirs}${libdirs:+;}&quot;${opt}/\$(PlatformName)&quot;"
             fi
         ;;
         -l*) libs="${libs}${libs:+ }${opt##-l}.lib"
@@ -268,23 +200,22 @@ for opt in "$@"; do
         -*) die_unknown $opt
         ;;
         *)
+            # The paths in file_list are fixed outside of the loop.
             file_list[${#file_list[@]}]="$opt"
             case "$opt" in
-                 *.asm|*.s) uses_asm=true
+                 *.asm|*.[Ss]) uses_asm=true
                  ;;
             esac
         ;;
     esac
 done
+
+# Make one call to fix_path for file_list to improve performance.
+fix_file_list file_list
+
 outfile=${outfile:-/dev/stdout}
 guid=${guid:-`generate_uuid`}
-asm_use_custom_step=false
 uses_asm=${uses_asm:-false}
-case "${vs_ver:-11}" in
-    10|11|12)
-       asm_use_custom_step=$uses_asm
-    ;;
-esac
 
 [ -n "$name" ] || die "Project name (--name) must be specified!"
 [ -n "$target" ] || die "Target (--target) must be specified!"
@@ -316,24 +247,23 @@ libs=${libs// /;}
 case "$target" in
     x86_64*)
         platforms[0]="x64"
-        asm_Debug_cmdline="yasm -Xvc -g cv8 -f \$(PlatformName) ${yasmincs} &quot;%(FullPath)&quot;"
-        asm_Release_cmdline="yasm -Xvc -f \$(PlatformName) ${yasmincs} &quot;%(FullPath)&quot;"
+        asm_Debug_cmdline="yasm -Xvc -g cv8 -f win64 ${yasmincs} &quot;%(FullPath)&quot;"
+        asm_Release_cmdline="yasm -Xvc -f win64 ${yasmincs} &quot;%(FullPath)&quot;"
     ;;
     x86*)
         platforms[0]="Win32"
-        asm_Debug_cmdline="yasm -Xvc -g cv8 -f \$(PlatformName) ${yasmincs} &quot;%(FullPath)&quot;"
-        asm_Release_cmdline="yasm -Xvc -f \$(PlatformName) ${yasmincs} &quot;%(FullPath)&quot;"
+        asm_Debug_cmdline="yasm -Xvc -g cv8 -f win32 ${yasmincs} &quot;%(FullPath)&quot;"
+        asm_Release_cmdline="yasm -Xvc -f win32 ${yasmincs} &quot;%(FullPath)&quot;"
+    ;;
+    arm64*)
+        platforms[0]="ARM64"
+        asm_Debug_cmdline="armasm64 -nologo -oldit &quot;%(FullPath)&quot;"
+        asm_Release_cmdline="armasm64 -nologo -oldit &quot;%(FullPath)&quot;"
     ;;
     arm*)
-        asm_Debug_cmdline="armasm -nologo &quot;%(FullPath)&quot;"
-        asm_Release_cmdline="armasm -nologo &quot;%(FullPath)&quot;"
-        if [ "$name" = "obj_int_extract" ]; then
-            # We don't want to build this tool for the target architecture,
-            # but for an architecture we can run locally during the build.
-            platforms[0]="Win32"
-        else
-            platforms[0]="ARM"
-        fi
+        platforms[0]="ARM"
+        asm_Debug_cmdline="armasm -nologo -oldit &quot;%(FullPath)&quot;"
+        asm_Release_cmdline="armasm -nologo -oldit &quot;%(FullPath)&quot;"
     ;;
     *) die "Unsupported target $target!"
     ;;
@@ -364,6 +294,28 @@ generate_vcxproj() {
         tag_content ProjectGuid "{${guid}}"
         tag_content RootNamespace ${name}
         tag_content Keyword ManagedCProj
+        if [ $vs_ver -ge 12 ] && [ "${platforms[0]}" = "ARM" ]; then
+            tag_content AppContainerApplication true
+            # The application type can be one of "Windows Store",
+            # "Windows Phone" or "Windows Phone Silverlight". The
+            # actual value doesn't matter from the libvpx point of view,
+            # since a static library built for one works on the others.
+            # The PlatformToolset field needs to be set in sync with this;
+            # for Windows Store and Windows Phone Silverlight it should be
+            # v120 while it should be v120_wp81 if the type is Windows Phone.
+            tag_content ApplicationType "Windows Store"
+            tag_content ApplicationTypeRevision 8.1
+        fi
+        if [ "${platforms[0]}" = "ARM64" ]; then
+            # Require the first Visual Studio version to have ARM64 support.
+            tag_content MinimumVisualStudioVersion 15.9
+        fi
+        if [ $vs_ver -eq 15 ] && [ "${platforms[0]}" = "ARM64" ]; then
+            # Since VS 15 does not have a 'use latest SDK version' facility,
+            # specifically require the contemporaneous SDK with official ARM64
+            # support.
+            tag_content WindowsTargetPlatformVersion 10.0.17763.0
+        fi
     close_tag PropertyGroup
 
     tag Import \
@@ -381,33 +333,14 @@ generate_vcxproj() {
             else
                 tag_content ConfigurationType StaticLibrary
             fi
-            if [ "$vs_ver" = "11" ]; then
-                if [ "$plat" = "ARM" ]; then
-                    # Setting the wp80 toolchain automatically sets the
-                    # WINAPI_FAMILY define, which is required for building
-                    # code for arm with the windows headers. Alternatively,
-                    # one could add AppContainerApplication=true in the Globals
-                    # section and add PrecompiledHeader=NotUsing and
-                    # CompileAsWinRT=false in ClCompile and SubSystem=Console
-                    # in Link.
-                    tag_content PlatformToolset v110_wp80
-                else
-                    tag_content PlatformToolset v110
-                fi
+            if [ "$vs_ver" = "14" ]; then
+                tag_content PlatformToolset v140
             fi
-            if [ "$vs_ver" = "12" ]; then
-                if [ "$plat" = "ARM" ]; then
-                    # Setting the wp80 toolchain automatically sets the
-                    # WINAPI_FAMILY define, which is required for building
-                    # code for arm with the windows headers. Alternatively,
-                    # one could add AppContainerApplication=true in the Globals
-                    # section and add PrecompiledHeader=NotUsing and
-                    # CompileAsWinRT=false in ClCompile and SubSystem=Console
-                    # in Link.
-                    tag_content PlatformToolset v120_wp80
-                else
-                    tag_content PlatformToolset v120
-                fi
+            if [ "$vs_ver" = "15" ]; then
+                tag_content PlatformToolset v141
+            fi
+            if [ "$vs_ver" = "16" ]; then
+                tag_content PlatformToolset v142
             fi
             tag_content CharacterSet Unicode
             if [ "$config" = "Release" ]; then
@@ -459,23 +392,13 @@ generate_vcxproj() {
                 if [ "$hostplat" == "ARM" ]; then
                     hostplat=Win32
                 fi
-                open_tag PreBuildEvent
-                tag_content Command "call obj_int_extract.bat $src_path_bare $hostplat\\\$(Configuration)"
-                close_tag PreBuildEvent
             fi
             open_tag ClCompile
             if [ "$config" = "Debug" ]; then
                 opt=Disabled
                 runtime=$debug_runtime
                 curlibs=$debug_libs
-                case "$name" in
-                obj_int_extract)
-                    debug=DEBUG
-                    ;;
-                *)
-                    debug=_DEBUG
-                    ;;
-                esac
+                debug=_DEBUG
             else
                 opt=MaxSpeed
                 runtime=$release_runtime
@@ -483,14 +406,7 @@ generate_vcxproj() {
                 tag_content FavorSizeOrSpeed Speed
                 debug=NDEBUG
             fi
-            case "$name" in
-            obj_int_extract)
-                extradefines=";_CONSOLE"
-                ;;
-            *)
-                extradefines=";$defines"
-                ;;
-            esac
+            extradefines=";$defines"
             tag_content Optimization $opt
             tag_content AdditionalIncludeDirectories "$incs;%(AdditionalIncludeDirectories)"
             tag_content PreprocessorDefinitions "WIN32;$debug;_CRT_SECURE_NO_WARNINGS;_CRT_SECURE_NO_DEPRECATE$extradefines;%(PreprocessorDefinitions)"
@@ -499,15 +415,21 @@ generate_vcxproj() {
             if ${werror:-false}; then
                 tag_content TreatWarningAsError true
             fi
+            if [ $vs_ver -ge 11 ]; then
+                # We need to override the defaults for these settings
+                # if AppContainerApplication is set.
+                tag_content CompileAsWinRT false
+                tag_content PrecompiledHeader NotUsing
+                tag_content SDLCheck false
+            fi
             close_tag ClCompile
             case "$proj_kind" in
             exe)
                 open_tag Link
-                if [ "$name" != "obj_int_extract" ]; then
-                    tag_content AdditionalDependencies "$curlibs"
-                    tag_content AdditionalLibraryDirectories "$libdirs;%(AdditionalLibraryDirectories)"
-                fi
                 tag_content GenerateDebugInformation true
+                # Console is the default normally, but if
+                # AppContainerApplication is set, we need to override it.
+                tag_content SubSystem Console
                 close_tag Link
                 ;;
             dll)
@@ -525,7 +447,7 @@ generate_vcxproj() {
     done
 
     open_tag ItemGroup
-    generate_filter "Source Files"   "c;cc;cpp;def;odl;idl;hpj;bat;asm;asmx;s"
+    generate_filter "Source Files"   "c;cc;cpp;def;odl;idl;hpj;bat;asm;asmx;s;S"
     close_tag ItemGroup
     open_tag ItemGroup
     generate_filter "Header Files"   "h;hm;inl;inc;xsd"

@@ -72,8 +72,8 @@ static void cmv_decode_intra(CmvContext * s, AVFrame *frame,
     }
 }
 
-static void cmv_motcomp(unsigned char *dst, int dst_stride,
-                        const unsigned char *src, int src_stride,
+static void cmv_motcomp(unsigned char *dst, ptrdiff_t dst_stride,
+                        const unsigned char *src, ptrdiff_t src_stride,
                         int x, int y,
                         int xoffset, int yoffset,
                         int width, int height){
@@ -154,7 +154,7 @@ static int cmv_process_header(CmvContext *s, const uint8_t *buf, const uint8_t *
 
     fps = AV_RL16(&buf[10]);
     if (fps > 0)
-        s->avctx->time_base = (AVRational){ 1, fps };
+        s->avctx->framerate = (AVRational){ fps, 1 };
 
     pal_start = AV_RL16(&buf[12]);
     pal_count = AV_RL16(&buf[14]);
@@ -191,12 +191,12 @@ static int cmv_decode_frame(AVCodecContext *avctx,
         if (ret < 0)
             return ret;
         if (size > buf_end - buf - EA_PREAMBLE_SIZE)
-            return -1;
+            return AVERROR_INVALIDDATA;
         buf += size;
     }
 
-    if (av_image_check_size(s->width, s->height, 0, s->avctx))
-        return -1;
+    if ((ret = av_image_check_size(s->width, s->height, 0, s->avctx)) < 0)
+        return ret;
 
     if ((ret = ff_get_buffer(avctx, frame, AV_GET_BUFFER_FLAG_REF)) < 0)
         return ret;
@@ -242,5 +242,5 @@ AVCodec ff_eacmv_decoder = {
     .init           = cmv_decode_init,
     .close          = cmv_decode_end,
     .decode         = cmv_decode_frame,
-    .capabilities   = CODEC_CAP_DR1,
+    .capabilities   = AV_CODEC_CAP_DR1,
 };

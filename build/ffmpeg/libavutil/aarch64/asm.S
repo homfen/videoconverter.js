@@ -23,7 +23,7 @@
 #ifdef __ELF__
 #   define ELF
 #else
-#   define ELF  #
+#   define ELF #
 #endif
 
 #if HAVE_AS_FUNC
@@ -52,25 +52,52 @@ FUNC    .func   \name
     .endif
 .endm
 
-.macro  const   name, align=2
+.macro  const   name, align=2, relocate=0
     .macro endconst
 ELF     .size   \name, . - \name
         .purgem endconst
     .endm
+#if HAVE_SECTION_DATA_REL_RO
+.if \relocate
+        .section        .data.rel.ro
+.else
         .section        .rodata
+.endif
+#elif defined(_WIN32)
+        .section        .rdata
+#elif !defined(__MACH__)
+        .section        .rodata
+#else
+        .const_data
+#endif
         .align          \align
 \name:
 .endm
 
-.macro  movrel rd, val
+.macro  movrel rd, val, offset=0
 #if CONFIG_PIC && defined(__APPLE__)
+    .if \offset < 0
         adrp            \rd, \val@PAGE
         add             \rd, \rd, \val@PAGEOFF
-#elif CONFIG_PIC
+        sub             \rd, \rd, -(\offset)
+    .else
+        adrp            \rd, \val+(\offset)@PAGE
+        add             \rd, \rd, \val+(\offset)@PAGEOFF
+    .endif
+#elif CONFIG_PIC && defined(_WIN32)
+    .if \offset < 0
         adrp            \rd, \val
         add             \rd, \rd, :lo12:\val
+        sub             \rd, \rd, -(\offset)
+    .else
+        adrp            \rd, \val+(\offset)
+        add             \rd, \rd, :lo12:\val+(\offset)
+    .endif
+#elif CONFIG_PIC
+        adrp            \rd, \val+(\offset)
+        add             \rd, \rd, :lo12:\val+(\offset)
 #else
-        ldr             \rd, =\val
+        ldr             \rd, =\val+\offset
 #endif
 .endm
 

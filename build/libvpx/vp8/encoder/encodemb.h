@@ -8,9 +8,8 @@
  *  be found in the AUTHORS file in the root of the source tree.
  */
 
-
-#ifndef VP8_ENCODER_ENCODEMB_H_
-#define VP8_ENCODER_ENCODEMB_H_
+#ifndef VPX_VP8_ENCODER_ENCODEMB_H_
+#define VPX_VP8_ENCODER_ENCODEMB_H_
 
 #include "onyx_int.h"
 
@@ -18,6 +17,13 @@
 extern "C" {
 #endif
 void vp8_encode_inter16x16(MACROBLOCK *x);
+
+void vp8_subtract_b(BLOCK *be, BLOCKD *bd, int pitch);
+void vp8_subtract_mbuv(short *diff, unsigned char *usrc, unsigned char *vsrc,
+                       int src_stride, unsigned char *upred,
+                       unsigned char *vpred, int pred_stride);
+void vp8_subtract_mby(short *diff, unsigned char *src, int src_stride,
+                      unsigned char *pred, int pred_stride);
 
 void vp8_build_dcblock(MACROBLOCK *b);
 void vp8_transform_mb(MACROBLOCK *mb);
@@ -31,4 +37,4 @@ void vp8_encode_inter16x16y(MACROBLOCK *x);
 }  // extern "C"
 #endif
 
-#endif  // VP8_ENCODER_ENCODEMB_H_
+#endif  // VPX_VP8_ENCODER_ENCODEMB_H_

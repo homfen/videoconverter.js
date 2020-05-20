@@ -8,27 +8,27 @@
  *  be found in the AUTHORS file in the root of the source tree.
  */
 
+#ifndef VPX_VP9_ENCODER_VP9_AQ_VARIANCE_H_
+#define VPX_VP9_ENCODER_VP9_AQ_VARIANCE_H_
 
-#ifndef VP9_ENCODER_VP9_AQ_VARIANCE_H_
-#define VP9_ENCODER_VP9_AQ_VARIANCE_H_
-
-#include "vp9/encoder/vp9_onyx_int.h"
+#include "vp9/encoder/vp9_encoder.h"
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
 unsigned int vp9_vaq_segment_id(int energy);
-double vp9_vaq_rdmult_ratio(int energy);
-double vp9_vaq_inv_q_ratio(int energy);
-
-void vp9_vaq_init();
 void vp9_vaq_frame_setup(VP9_COMP *cpi);
 
+void vp9_get_sub_block_energy(VP9_COMP *cpi, MACROBLOCK *mb, int mi_row,
+                              int mi_col, BLOCK_SIZE bsize, int *min_e,
+                              int *max_e);
 int vp9_block_energy(VP9_COMP *cpi, MACROBLOCK *x, BLOCK_SIZE bs);
+
+double vp9_log_block_var(VP9_COMP *cpi, MACROBLOCK *x, BLOCK_SIZE bs);
 
 #ifdef __cplusplus
 }  // extern "C"
 #endif
 
-#endif  // VP9_ENCODER_VP9_AQ_VARIANCE_H_
+#endif  // VPX_VP9_ENCODER_VP9_AQ_VARIANCE_H_

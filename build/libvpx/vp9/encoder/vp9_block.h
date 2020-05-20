@@ -8,76 +8,40 @@
  *  be found in the AUTHORS file in the root of the source tree.
  */
 
-#ifndef VP9_ENCODER_VP9_BLOCK_H_
-#define VP9_ENCODER_VP9_BLOCK_H_
+#ifndef VPX_VP9_ENCODER_VP9_BLOCK_H_
+#define VPX_VP9_ENCODER_VP9_BLOCK_H_
+
+#include "vpx_util/vpx_thread.h"
 
 #include "vp9/common/vp9_entropymv.h"
 #include "vp9/common/vp9_entropy.h"
-#include "vpx_ports/mem.h"
-#include "vp9/common/vp9_onyxc_int.h"
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-// motion search site
 typedef struct {
-  MV mv;
-  int offset;
-} search_site;
-
-// Structure to hold snapshot of coding context during the mode picking process
-typedef struct {
-  MODE_INFO mic;
-  uint8_t *zcoeff_blk;
-  int16_t *coeff[MAX_MB_PLANE][3];
-  int16_t *qcoeff[MAX_MB_PLANE][3];
-  int16_t *dqcoeff[MAX_MB_PLANE][3];
-  uint16_t *eobs[MAX_MB_PLANE][3];
-
-  // dual buffer pointers, 0: in use, 1: best in store
-  int16_t *coeff_pbuf[MAX_MB_PLANE][3];
-  int16_t *qcoeff_pbuf[MAX_MB_PLANE][3];
-  int16_t *dqcoeff_pbuf[MAX_MB_PLANE][3];
-  uint16_t *eobs_pbuf[MAX_MB_PLANE][3];
-
-  int is_coded;
-  int num_4x4_blk;
-  int skip;
-  int_mv best_ref_mv[2];
-  int_mv ref_mvs[MAX_REF_FRAMES][MAX_MV_REF_CANDIDATES];
-  int rate;
-  int distortion;
-  int best_mode_index;
-  int rddiv;
-  int rdmult;
-  int hybrid_pred_diff;
-  int comp_pred_diff;
-  int single_pred_diff;
-  int64_t tx_rd_diff[TX_MODES];
-  int64_t best_filter_diff[SWITCHABLE_FILTER_CONTEXTS];
-
-  // motion vector cache for adaptive motion search control in partition
-  // search loop
-  int_mv pred_mv[MAX_REF_FRAMES];
-  INTERP_FILTER pred_interp_filter;
-} PICK_MODE_CONTEXT;
+  unsigned int sse;
+  int sum;
+  unsigned int var;
+} diff;
 
 struct macroblock_plane {
   DECLARE_ALIGNED(16, int16_t, src_diff[64 * 64]);
-  int16_t *qcoeff;
-  int16_t *coeff;
+  tran_low_t *qcoeff;
+  tran_low_t *coeff;
   uint16_t *eobs;
   struct buf_2d src;
 
   // Quantizer setings
+  DECLARE_ALIGNED(16, int16_t, round_fp[8]);
+  int16_t *quant_fp;
   int16_t *quant;
   int16_t *quant_shift;
   int16_t *zbin;
   int16_t *round;
 
-  // Zbin Over Quant value
-  int16_t zbin_extra;
+  int64_t quant_thred[2];
 };
 
 /* The [2] dimension is for whether we skip the EOB node (i.e. if previous
@@ -85,30 +49,57 @@ struct macroblock_plane {
 typedef unsigned int vp9_coeff_cost[PLANE_TYPES][REF_TYPES][COEF_BANDS][2]
                                    [COEFF_CONTEXTS][ENTROPY_TOKENS];
 
+typedef struct {
+  int_mv ref_mvs[MAX_REF_FRAMES][MAX_MV_REF_CANDIDATES];
+  uint8_t mode_context[MAX_REF_FRAMES];
+} MB_MODE_INFO_EXT;
+
+typedef struct {
+  int col_min;
+  int col_max;
+  int row_min;
+  int row_max;
+} MvLimits;
+
 typedef struct macroblock MACROBLOCK;
 struct macroblock {
+// cf. https://bugs.chromium.org/p/webm/issues/detail?id=1054
+#if defined(_MSC_VER) && _MSC_VER < 1900
+  int64_t bsse[MAX_MB_PLANE << 2];
+#endif
+
   struct macroblock_plane plane[MAX_MB_PLANE];
 
   MACROBLOCKD e_mbd;
+  MB_MODE_INFO_EXT *mbmi_ext;
+  MB_MODE_INFO_EXT *mbmi_ext_base;
   int skip_block;
-  int select_txfm_size;
+  int select_tx_size;
   int skip_recode;
   int skip_optimize;
   int q_index;
+  int block_qcoeff_opt;
+  int block_tx_domain;
 
-  search_site *ss;
-  int ss_count;
-  int searches_per_step;
-
+  // The equivalent error at the current rdmult of one whole bit (not one
+  // bitcost unit).
   int errorperbit;
+  // The equivalend SAD error of one (whole) bit at the current quantizer
+  // for large blocks.
   int sadperbit16;
+  // The equivalend SAD error of one (whole) bit at the current quantizer
+  // for sub-8x8 blocks.
   int sadperbit4;
   int rddiv;
   int rdmult;
-  unsigned int mb_energy;
-  unsigned int *mb_activity_ptr;
-  int *mb_norm_activity_ptr;
-  signed int act_zbin_adj;
+  int cb_rdmult;
+  int segment_id;
+  int mb_energy;
+
+  // These are set to their default values at the beginning, and then adjusted
+  // further in the encoding process.
+  BLOCK_SIZE min_partition_size;
+  BLOCK_SIZE max_partition_size;
 
   int mv_best_ref_index[MAX_REF_FRAMES];
   unsigned int max_mv_context[MAX_REF_FRAMES];
@@ -117,43 +108,35 @@ struct macroblock {
   int pred_mv_sad[MAX_REF_FRAMES];
 
   int nmvjointcost[MV_JOINTS];
-  int nmvcosts[2][MV_VALS];
   int *nmvcost[2];
-  int nmvcosts_hp[2][MV_VALS];
   int *nmvcost_hp[2];
   int **mvcost;
 
   int nmvjointsadcost[MV_JOINTS];
-  int nmvsadcosts[2][MV_VALS];
   int *nmvsadcost[2];
-  int nmvsadcosts_hp[2][MV_VALS];
   int *nmvsadcost_hp[2];
   int **mvsadcost;
 
-  int mbmode_cost[INTRA_MODES];
-  unsigned inter_mode_cost[INTER_MODE_CONTEXTS][INTER_MODES];
-  int intra_uv_mode_cost[FRAME_TYPES][INTRA_MODES];
-  int y_mode_costs[INTRA_MODES][INTRA_MODES][INTRA_MODES];
-  int switchable_interp_costs[SWITCHABLE_FILTER_CONTEXTS][SWITCHABLE_FILTERS];
+  // sharpness is used to disable skip mode and change rd_mult
+  int sharpness;
 
-  unsigned char sb_index;   // index of 32x32 block inside the 64x64 block
-  unsigned char mb_index;   // index of 16x16 block inside the 32x32 block
-  unsigned char b_index;    // index of 8x8 block inside the 16x16 block
-  unsigned char ab_index;   // index of 4x4 block inside the 8x8 block
+  // aq mode is used to adjust rd based on segment.
+  int adjust_rdmult_by_segment;
 
   // These define limits to motion vector components to prevent them
   // from extending outside the UMV borders
-  int mv_col_min;
-  int mv_col_max;
-  int mv_row_min;
-  int mv_row_max;
+  MvLimits mv_limits;
 
+  // Notes transform blocks where no coefficents are coded.
+  // Set during mode selection. Read during block encoding.
   uint8_t zcoeff_blk[TX_SIZES][256];
+
+  // Accumulate the tx block eobs in a partition block.
+  int32_t sum_y_eobs[TX_SIZES];
+
   int skip;
 
   int encode_breakout;
-
-  int in_active_map;
 
   // note that token_costs is the cost when eob node is skipped
   vp9_coeff_cost token_costs[TX_SIZES];
@@ -164,75 +147,75 @@ struct macroblock {
   int use_lp32x32fdct;
   int skip_encode;
 
+  // In first pass, intra prediction is done based on source pixels
+  // at tile boundaries
+  int fp_src_pred;
+
+  // use fast quantization process
+  int quant_fp;
+
+  // skip forward transform and quantization
+  uint8_t skip_txfm[MAX_MB_PLANE << 2];
+#define SKIP_TXFM_NONE 0
+#define SKIP_TXFM_AC_DC 1
+#define SKIP_TXFM_AC_ONLY 2
+
+// cf. https://bugs.chromium.org/p/webm/issues/detail?id=1054
+#if !defined(_MSC_VER) || _MSC_VER >= 1900
+  int64_t bsse[MAX_MB_PLANE << 2];
+#endif
+
   // Used to store sub partition's choices.
-  int_mv pred_mv[MAX_REF_FRAMES];
+  MV pred_mv[MAX_REF_FRAMES];
 
-  // TODO(jingning): Need to refactor the structure arrays that buffers the
-  // coding mode decisions of each partition type.
-  PICK_MODE_CONTEXT ab4x4_context[4][4][4];
-  PICK_MODE_CONTEXT sb8x4_context[4][4][4];
-  PICK_MODE_CONTEXT sb4x8_context[4][4][4];
-  PICK_MODE_CONTEXT sb8x8_context[4][4][4];
-  PICK_MODE_CONTEXT sb8x16_context[4][4][2];
-  PICK_MODE_CONTEXT sb16x8_context[4][4][2];
-  PICK_MODE_CONTEXT mb_context[4][4];
-  PICK_MODE_CONTEXT sb32x16_context[4][2];
-  PICK_MODE_CONTEXT sb16x32_context[4][2];
-  // when 4 MBs share coding parameters:
-  PICK_MODE_CONTEXT sb32_context[4];
-  PICK_MODE_CONTEXT sb32x64_context[2];
-  PICK_MODE_CONTEXT sb64x32_context[2];
-  PICK_MODE_CONTEXT sb64_context;
-  int partition_cost[PARTITION_CONTEXTS][PARTITION_TYPES];
+  // Strong color activity detection. Used in RTC coding mode to enhance
+  // the visual quality at the boundary of moving color objects.
+  uint8_t color_sensitivity[2];
 
-  BLOCK_SIZE b_partitioning[4][4][4];
-  BLOCK_SIZE mb_partitioning[4][4];
-  BLOCK_SIZE sb_partitioning[4];
-  BLOCK_SIZE sb64_partitioning;
+  uint8_t sb_is_skin;
 
-  void (*fwd_txm4x4)(const int16_t *input, int16_t *output, int stride);
+  uint8_t skip_low_source_sad;
+
+  uint8_t lowvar_highsumdiff;
+
+  uint8_t last_sb_high_content;
+
+  int sb_use_mv_part;
+
+  int sb_mvcol_part;
+
+  int sb_mvrow_part;
+
+  int sb_pickmode_part;
+
+  int zero_temp_sad_source;
+
+  // For each superblock: saves the content value (e.g., low/high sad/sumdiff)
+  // based on source sad, prior to encoding the frame.
+  uint8_t content_state_sb;
+
+  // Used to save the status of whether a block has a low variance in
+  // choose_partitioning. 0 for 64x64, 1~2 for 64x32, 3~4 for 32x64, 5~8 for
+  // 32x32, 9~24 for 16x16.
+  uint8_t variance_low[25];
+
+  uint8_t arf_frame_usage;
+  uint8_t lastgolden_frame_usage;
+
+  void (*fwd_txfm4x4)(const int16_t *input, tran_low_t *output, int stride);
+  void (*inv_txfm_add)(const tran_low_t *input, uint8_t *dest, int stride,
+                       int eob);
+#if CONFIG_VP9_HIGHBITDEPTH
+  void (*highbd_inv_txfm_add)(const tran_low_t *input, uint16_t *dest,
+                              int stride, int eob, int bd);
+#endif
+  DECLARE_ALIGNED(16, uint8_t, est_pred[64 * 64]);
+
+  struct scale_factors *me_sf;
 };
-
-// TODO(jingning): the variables used here are little complicated. need further
-// refactoring on organizing the temporary buffers, when recursive
-// partition down to 4x4 block size is enabled.
-static INLINE PICK_MODE_CONTEXT *get_block_context(MACROBLOCK *x,
-                                                   BLOCK_SIZE bsize) {
-  switch (bsize) {
-    case BLOCK_64X64:
-      return &x->sb64_context;
-    case BLOCK_64X32:
-      return &x->sb64x32_context[x->sb_index];
-    case BLOCK_32X64:
-      return &x->sb32x64_context[x->sb_index];
-    case BLOCK_32X32:
-      return &x->sb32_context[x->sb_index];
-    case BLOCK_32X16:
-      return &x->sb32x16_context[x->sb_index][x->mb_index];
-    case BLOCK_16X32:
-      return &x->sb16x32_context[x->sb_index][x->mb_index];
-    case BLOCK_16X16:
-      return &x->mb_context[x->sb_index][x->mb_index];
-    case BLOCK_16X8:
-      return &x->sb16x8_context[x->sb_index][x->mb_index][x->b_index];
-    case BLOCK_8X16:
-      return &x->sb8x16_context[x->sb_index][x->mb_index][x->b_index];
-    case BLOCK_8X8:
-      return &x->sb8x8_context[x->sb_index][x->mb_index][x->b_index];
-    case BLOCK_8X4:
-      return &x->sb8x4_context[x->sb_index][x->mb_index][x->b_index];
-    case BLOCK_4X8:
-      return &x->sb4x8_context[x->sb_index][x->mb_index][x->b_index];
-    case BLOCK_4X4:
-      return &x->ab4x4_context[x->sb_index][x->mb_index][x->b_index];
-    default:
-      assert(0);
-      return NULL;
-  }
-}
 
 #ifdef __cplusplus
 }  // extern "C"
 #endif
 
-#endif  // VP9_ENCODER_VP9_BLOCK_H_
+#endif  // VPX_VP9_ENCODER_VP9_BLOCK_H_

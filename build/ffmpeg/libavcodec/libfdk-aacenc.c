@@ -26,11 +26,20 @@
 #include "audio_frame_queue.h"
 #include "internal.h"
 
+#ifdef AACENCODER_LIB_VL0
+#define FDKENC_VER_AT_LEAST(vl0, vl1) \
+    ((AACENCODER_LIB_VL0 > vl0) || \
+     (AACENCODER_LIB_VL0 == vl0 && AACENCODER_LIB_VL1 >= vl1))
+#else
+#define FDKENC_VER_AT_LEAST(vl0, vl1) 0
+#endif
+
 typedef struct AACContext {
     const AVClass *class;
     HANDLE_AACENCODER handle;
     int afterburner;
     int eld_sbr;
+    int eld_v2;
     int signaling;
     int latm;
     int header_period;
@@ -42,6 +51,9 @@ typedef struct AACContext {
 static const AVOption aac_enc_options[] = {
     { "afterburner", "Afterburner (improved quality)", offsetof(AACContext, afterburner), AV_OPT_TYPE_INT, { .i64 = 1 }, 0, 1, AV_OPT_FLAG_AUDIO_PARAM | AV_OPT_FLAG_ENCODING_PARAM },
     { "eld_sbr", "Enable SBR for ELD (for SBR in other configurations, use the -profile parameter)", offsetof(AACContext, eld_sbr), AV_OPT_TYPE_INT, { .i64 = 0 }, 0, 1, AV_OPT_FLAG_AUDIO_PARAM | AV_OPT_FLAG_ENCODING_PARAM },
+#if FDKENC_VER_AT_LEAST(4, 0) // 4.0.0
+    { "eld_v2", "Enable ELDv2 (LD-MPS extension for ELD stereo signals)", offsetof(AACContext, eld_v2), AV_OPT_TYPE_INT, { .i64 = 0 }, 0, 1, AV_OPT_FLAG_AUDIO_PARAM | AV_OPT_FLAG_ENCODING_PARAM },
+#endif
     { "signaling", "SBR/PS signaling style", offsetof(AACContext, signaling), AV_OPT_TYPE_INT, { .i64 = -1 }, -1, 2, AV_OPT_FLAG_AUDIO_PARAM | AV_OPT_FLAG_ENCODING_PARAM, "signaling" },
     { "default", "Choose signaling implicitly (explicit hierarchical by default, implicit if global header is disabled)", 0, AV_OPT_TYPE_CONST, { .i64 = -1 }, 0, 0, AV_OPT_FLAG_AUDIO_PARAM | AV_OPT_FLAG_ENCODING_PARAM, "signaling" },
     { "implicit", "Implicit backwards compatible signaling", 0, AV_OPT_TYPE_CONST, { .i64 = 0 }, 0, 0, AV_OPT_FLAG_AUDIO_PARAM | AV_OPT_FLAG_ENCODING_PARAM, "signaling" },
@@ -54,7 +66,10 @@ static const AVOption aac_enc_options[] = {
 };
 
 static const AVClass aac_enc_class = {
-    "libfdk_aac", av_default_item_name, aac_enc_options, LIBAVUTIL_VERSION_INT
+    .class_name = "libfdk_aac",
+    .item_name  = av_default_item_name,
+    .option     = aac_enc_options,
+    .version    = LIBAVUTIL_VERSION_INT,
 };
 
 static const char *aac_get_error(AACENC_ERROR err)
@@ -144,14 +159,35 @@ static av_cold int aac_encode_init(AVCodecContext *avctx)
 
     switch (avctx->channels) {
     case 1: mode = MODE_1;       sce = 1; cpe = 0; break;
-    case 2: mode = MODE_2;       sce = 0; cpe = 1; break;
+    case 2:
+#if FDKENC_VER_AT_LEAST(4, 0) // 4.0.0
+      // (profile + 1) to map from profile range to AOT range
+      if (aot == FF_PROFILE_AAC_ELD + 1 && s->eld_v2) {
+          if ((err = aacEncoder_SetParam(s->handle, AACENC_CHANNELMODE,
+                                         128)) != AACENC_OK) {
+              av_log(avctx, AV_LOG_ERROR, "Unable to enable ELDv2: %s\n",
+                     aac_get_error(err));
+              goto error;
+          } else {
+            mode = MODE_212;
+            sce = 1;
+            cpe = 0;
+          }
+      } else
+#endif
+      {
+        mode = MODE_2;
+        sce = 0;
+        cpe = 1;
+      }
+      break;
     case 3: mode = MODE_1_2;     sce = 1; cpe = 1; break;
     case 4: mode = MODE_1_2_1;   sce = 2; cpe = 1; break;
     case 5: mode = MODE_1_2_2;   sce = 1; cpe = 2; break;
     case 6: mode = MODE_1_2_2_1; sce = 2; cpe = 2; break;
 /* The version macro is introduced the same time as the 7.1 support, so this
    should suffice. */
-#ifdef AACENCODER_LIB_VL0
+#if FDKENC_VER_AT_LEAST(3, 4) // 3.4.12
     case 8:
         sce = 2;
         cpe = 3;
@@ -184,7 +220,7 @@ static av_cold int aac_encode_init(AVCodecContext *avctx)
         goto error;
     }
 
-    if (avctx->flags & CODEC_FLAG_QSCALE || s->vbr) {
+    if (avctx->flags & AV_CODEC_FLAG_QSCALE || s->vbr) {
         int mode = s->vbr ? s->vbr : avctx->global_quality;
         if (mode <  1 || mode > 5) {
             av_log(avctx, AV_LOG_WARNING,
@@ -215,7 +251,7 @@ static av_cold int aac_encode_init(AVCodecContext *avctx)
         }
         if ((err = aacEncoder_SetParam(s->handle, AACENC_BITRATE,
                                        avctx->bit_rate)) != AACENC_OK) {
-            av_log(avctx, AV_LOG_ERROR, "Unable to set the bitrate %d: %s\n",
+            av_log(avctx, AV_LOG_ERROR, "Unable to set the bitrate %"PRId64": %s\n",
                    avctx->bit_rate, aac_get_error(err));
             goto error;
         }
@@ -224,7 +260,8 @@ static av_cold int aac_encode_init(AVCodecContext *avctx)
     /* Choose bitstream format - if global header is requested, use
      * raw access units, otherwise use ADTS. */
     if ((err = aacEncoder_SetParam(s->handle, AACENC_TRANSMUX,
-                                   avctx->flags & CODEC_FLAG_GLOBAL_HEADER ? 0 : s->latm ? 10 : 2)) != AACENC_OK) {
+                                   avctx->flags & AV_CODEC_FLAG_GLOBAL_HEADER ? TT_MP4_RAW :
+                                   s->latm ? TT_MP4_LOAS : TT_MP4_ADTS)) != AACENC_OK) {
         av_log(avctx, AV_LOG_ERROR, "Unable to set the transmux format: %s\n",
                aac_get_error(err));
         goto error;
@@ -243,7 +280,7 @@ static av_cold int aac_encode_init(AVCodecContext *avctx)
      * if using mp4 mode (raw access units, with global header) and
      * implicit signaling if using ADTS. */
     if (s->signaling < 0)
-        s->signaling = avctx->flags & CODEC_FLAG_GLOBAL_HEADER ? 2 : 0;
+        s->signaling = avctx->flags & AV_CODEC_FLAG_GLOBAL_HEADER ? 2 : 0;
 
     if ((err = aacEncoder_SetParam(s->handle, AACENC_SIGNALING_MODE,
                                    s->signaling)) != AACENC_OK) {
@@ -286,13 +323,17 @@ static av_cold int aac_encode_init(AVCodecContext *avctx)
     }
 
     avctx->frame_size = info.frameLength;
-    avctx->delay      = info.encoderDelay;
+#if FDKENC_VER_AT_LEAST(4, 0) // 4.0.0
+    avctx->initial_padding = info.nDelay;
+#else
+    avctx->initial_padding = info.encoderDelay;
+#endif
     ff_af_queue_init(avctx, &s->afq);
 
-    if (avctx->flags & CODEC_FLAG_GLOBAL_HEADER) {
+    if (avctx->flags & AV_CODEC_FLAG_GLOBAL_HEADER) {
         avctx->extradata_size = info.confSize;
         avctx->extradata      = av_mallocz(avctx->extradata_size +
-                                           FF_INPUT_BUFFER_PADDING_SIZE);
+                                           AV_INPUT_BUFFER_PADDING_SIZE);
         if (!avctx->extradata) {
             ret = AVERROR(ENOMEM);
             goto error;
@@ -319,30 +360,37 @@ static int aac_encode_frame(AVCodecContext *avctx, AVPacket *avpkt,
     int out_buffer_size, out_buffer_element_size;
     void *in_ptr, *out_ptr;
     int ret;
+    uint8_t dummy_buf[1];
     AACENC_ERROR err;
 
     /* handle end-of-stream small frame and flushing */
     if (!frame) {
+        /* Must be a non-null pointer, even if it's a dummy. We could use
+         * the address of anything else on the stack as well. */
+        in_ptr               = dummy_buf;
+        in_buffer_size       = 0;
+
         in_args.numInSamples = -1;
     } else {
-        in_ptr                   = frame->data[0];
-        in_buffer_size           = 2 * avctx->channels * frame->nb_samples;
-        in_buffer_element_size   = 2;
+        in_ptr               = frame->data[0];
+        in_buffer_size       = 2 * avctx->channels * frame->nb_samples;
 
-        in_args.numInSamples     = avctx->channels * frame->nb_samples;
-        in_buf.numBufs           = 1;
-        in_buf.bufs              = &in_ptr;
-        in_buf.bufferIdentifiers = &in_buffer_identifier;
-        in_buf.bufSizes          = &in_buffer_size;
-        in_buf.bufElSizes        = &in_buffer_element_size;
+        in_args.numInSamples = avctx->channels * frame->nb_samples;
 
         /* add current frame to the queue */
         if ((ret = ff_af_queue_add(&s->afq, frame)) < 0)
             return ret;
     }
 
+    in_buffer_element_size   = 2;
+    in_buf.numBufs           = 1;
+    in_buf.bufs              = &in_ptr;
+    in_buf.bufferIdentifiers = &in_buffer_identifier;
+    in_buf.bufSizes          = &in_buffer_size;
+    in_buf.bufElSizes        = &in_buffer_element_size;
+
     /* The maximum packet size is 6144 bits aka 768 bytes per channel. */
-    if ((ret = ff_alloc_packet2(avctx, avpkt, FFMAX(8192, 768 * avctx->channels))) < 0)
+    if ((ret = ff_alloc_packet2(avctx, avpkt, FFMAX(8192, 768 * avctx->channels), 0)) < 0)
         return ret;
 
     out_ptr                   = avpkt->data;
@@ -396,7 +444,7 @@ static const uint64_t aac_channel_layout[] = {
     AV_CH_LAYOUT_4POINT0,
     AV_CH_LAYOUT_5POINT0_BACK,
     AV_CH_LAYOUT_5POINT1_BACK,
-#ifdef AACENCODER_LIB_VL0
+#if FDKENC_VER_AT_LEAST(3, 4) // 3.4.12
     AV_CH_LAYOUT_7POINT1_WIDE_BACK,
     AV_CH_LAYOUT_7POINT1,
 #endif
@@ -417,7 +465,7 @@ AVCodec ff_libfdk_aac_encoder = {
     .init                  = aac_encode_init,
     .encode2               = aac_encode_frame,
     .close                 = aac_encode_close,
-    .capabilities          = CODEC_CAP_SMALL_LAST_FRAME | CODEC_CAP_DELAY,
+    .capabilities          = AV_CODEC_CAP_SMALL_LAST_FRAME | AV_CODEC_CAP_DELAY,
     .sample_fmts           = (const enum AVSampleFormat[]){ AV_SAMPLE_FMT_S16,
                                                             AV_SAMPLE_FMT_NONE },
     .priv_class            = &aac_enc_class,
@@ -425,4 +473,5 @@ AVCodec ff_libfdk_aac_encoder = {
     .profiles              = profiles,
     .supported_samplerates = aac_sample_rates,
     .channel_layouts       = aac_channel_layout,
+    .wrapper_name          = "libfdk",
 };

@@ -268,7 +268,7 @@ typedef struct SANMVideoContext {
     uint32_t pal[PALETTE_SIZE];
     int16_t delta_pal[PALETTE_DELTA];
 
-    int pitch;
+    ptrdiff_t pitch;
     int width, height;
     int aligned_width, aligned_height;
     int prev_seq;
@@ -457,15 +457,16 @@ static void destroy_buffers(SANMVideoContext *ctx)
     ctx->frm0_size =
     ctx->frm1_size =
     ctx->frm2_size = 0;
+    init_sizes(ctx, 0, 0);
 }
 
 static av_cold int init_buffers(SANMVideoContext *ctx)
 {
-    av_fast_padded_malloc(&ctx->frm0, &ctx->frm0_size, ctx->buf_size);
-    av_fast_padded_malloc(&ctx->frm1, &ctx->frm1_size, ctx->buf_size);
-    av_fast_padded_malloc(&ctx->frm2, &ctx->frm2_size, ctx->buf_size);
+    av_fast_padded_mallocz(&ctx->frm0, &ctx->frm0_size, ctx->buf_size);
+    av_fast_padded_mallocz(&ctx->frm1, &ctx->frm1_size, ctx->buf_size);
+    av_fast_padded_mallocz(&ctx->frm2, &ctx->frm2_size, ctx->buf_size);
     if (!ctx->version)
-        av_fast_padded_malloc(&ctx->stored_frame,
+        av_fast_padded_mallocz(&ctx->stored_frame,
                               &ctx->stored_frame_size, ctx->buf_size);
 
     if (!ctx->frm0 || !ctx->frm1 || !ctx->frm2 ||
@@ -490,6 +491,11 @@ static av_cold int decode_init(AVCodecContext *avctx)
 
     ctx->avctx   = avctx;
     ctx->version = !avctx->extradata_size;
+    // early sanity check before allocations to avoid need for deallocation code.
+    if (!ctx->version && avctx->extradata_size < 1026) {
+        av_log(avctx, AV_LOG_ERROR, "Not enough extradata.\n");
+        return AVERROR_INVALIDDATA;
+    }
 
     avctx->pix_fmt = ctx->version ? AV_PIX_FMT_RGB565 : AV_PIX_FMT_PAL8;
 
@@ -504,11 +510,6 @@ static av_cold int decode_init(AVCodecContext *avctx)
 
     if (!ctx->version) {
         int i;
-
-        if (avctx->extradata_size < 1026) {
-            av_log(avctx, AV_LOG_ERROR, "Not enough extradata.\n");
-            return AVERROR_INVALIDDATA;
-        }
 
         ctx->subversion = AV_RL16(avctx->extradata);
         for (i = 0; i < PALETTE_SIZE; i++)
@@ -622,7 +623,7 @@ static inline void codec37_mv(uint8_t *dst, const uint8_t *src,
 static int old_codec37(SANMVideoContext *ctx, int top,
                        int left, int width, int height)
 {
-    int stride = ctx->pitch;
+    ptrdiff_t stride = ctx->pitch;
     int i, j, k, t;
     uint8_t *dst, *prev;
     int skip_run = 0;
@@ -860,7 +861,7 @@ static int old_codec47(SANMVideoContext *ctx, int top,
 {
     uint32_t decoded_size;
     int i, j;
-    int stride     = ctx->pitch;
+    ptrdiff_t stride = ctx->pitch;
     uint8_t *dst   = (uint8_t *)ctx->frm0 + left + top * stride;
     uint8_t *prev1 = (uint8_t *)ctx->frm1;
     uint8_t *prev2 = (uint8_t *)ctx->frm2;
@@ -977,13 +978,10 @@ static int process_frame_obj(SANMVideoContext *ctx)
     case 1:
     case 3:
         return old_codec1(ctx, top, left, w, h);
-        break;
     case 37:
         return old_codec37(ctx, top, left, w, h);
-        break;
     case 47:
         return old_codec47(ctx, top, left, w, h);
-        break;
     default:
         avpriv_request_sample(ctx->avctx, "Subcodec %d", codec);
         return AVERROR_PATCHWELCOME;
@@ -1013,11 +1011,11 @@ static int decode_nop(SANMVideoContext *ctx)
     return AVERROR_PATCHWELCOME;
 }
 
-static void copy_block(uint16_t *pdest, uint16_t *psrc, int block_size, int pitch)
+static void copy_block(uint16_t *pdest, uint16_t *psrc, int block_size, ptrdiff_t pitch)
 {
     uint8_t *dst = (uint8_t *)pdest;
     uint8_t *src = (uint8_t *)psrc;
-    int stride = pitch * 2;
+    ptrdiff_t stride = pitch * 2;
 
     switch (block_size) {
     case 2:
@@ -1032,7 +1030,7 @@ static void copy_block(uint16_t *pdest, uint16_t *psrc, int block_size, int pitc
     }
 }
 
-static void fill_block(uint16_t *pdest, uint16_t color, int block_size, int pitch)
+static void fill_block(uint16_t *pdest, uint16_t color, int block_size, ptrdiff_t pitch)
 {
     int x, y;
 
@@ -1044,7 +1042,7 @@ static void fill_block(uint16_t *pdest, uint16_t color, int block_size, int pitc
 
 static int draw_glyph(SANMVideoContext *ctx, uint16_t *dst, int index,
                       uint16_t fg_color, uint16_t bg_color, int block_size,
-                      int pitch)
+                      ptrdiff_t pitch)
 {
     int8_t *pglyph;
     uint16_t colors[2] = { fg_color, bg_color };
@@ -1064,7 +1062,7 @@ static int draw_glyph(SANMVideoContext *ctx, uint16_t *dst, int index,
     return 0;
 }
 
-static int opcode_0xf7(SANMVideoContext *ctx, int cx, int cy, int block_size, int pitch)
+static int opcode_0xf7(SANMVideoContext *ctx, int cx, int cy, int block_size, ptrdiff_t pitch)
 {
     uint16_t *dst = ctx->frm0 + cx + cy * ctx->pitch;
 
@@ -1098,7 +1096,7 @@ static int opcode_0xf7(SANMVideoContext *ctx, int cx, int cy, int block_size, in
     return 0;
 }
 
-static int opcode_0xf8(SANMVideoContext *ctx, int cx, int cy, int block_size, int pitch)
+static int opcode_0xf8(SANMVideoContext *ctx, int cx, int cy, int block_size, ptrdiff_t pitch)
 {
     uint16_t *dst = ctx->frm0 + cx + cy * ctx->pitch;
 
@@ -1360,16 +1358,18 @@ static int read_frame_header(SANMVideoContext *ctx, SANMFrameHeader *hdr)
 
 static void fill_frame(uint16_t *pbuf, int buf_size, uint16_t color)
 {
-    while (buf_size--)
+    if (buf_size--) {
         *pbuf++ = color;
+        av_memcpy_backptr((uint8_t*)pbuf, 2, 2*buf_size);
+    }
 }
 
 static int copy_output(SANMVideoContext *ctx, SANMFrameHeader *hdr)
 {
     uint8_t *dst;
     const uint8_t *src = (uint8_t*) ctx->frm0;
-    int ret, dstpitch, height = ctx->height;
-    int srcpitch = ctx->pitch * (hdr ? sizeof(ctx->frm0[0]) : 1);
+    int ret, height = ctx->height;
+    ptrdiff_t dstpitch, srcpitch = ctx->pitch * (hdr ? sizeof(ctx->frm0[0]) : 1);
 
     if ((ret = ff_get_buffer(ctx->avctx, ctx->frame, 0)) < 0)
         return ret;
@@ -1407,14 +1407,14 @@ static int decode_frame(AVCodecContext *avctx, void *data,
             pos  = bytestream2_tell(&ctx->gb);
 
             if (bytestream2_get_bytes_left(&ctx->gb) < size) {
-                av_log(avctx, AV_LOG_ERROR, "Incorrect chunk size %d.\n", size);
+                av_log(avctx, AV_LOG_ERROR, "Incorrect chunk size %"PRIu32".\n", size);
                 break;
             }
             switch (sig) {
             case MKBETAG('N', 'P', 'A', 'L'):
                 if (size != PALETTE_SIZE * 3) {
                     av_log(avctx, AV_LOG_ERROR,
-                           "Incorrect palette block size %d.\n", size);
+                           "Incorrect palette block size %"PRIu32".\n", size);
                     return AVERROR_INVALIDDATA;
                 }
                 for (i = 0; i < PALETTE_SIZE; i++)
@@ -1440,7 +1440,8 @@ static int decode_frame(AVCodecContext *avctx, void *data,
                     }
                 } else {
                     if (size < PALETTE_DELTA * 2 + 4) {
-                        av_log(avctx, AV_LOG_ERROR, "Incorrect palette change block size %d.\n",
+                        av_log(avctx, AV_LOG_ERROR,
+                               "Incorrect palette change block size %"PRIu32".\n",
                                size);
                         return AVERROR_INVALIDDATA;
                     }
@@ -1463,7 +1464,8 @@ static int decode_frame(AVCodecContext *avctx, void *data,
                 break;
             default:
                 bytestream2_skip(&ctx->gb, size);
-                av_log(avctx, AV_LOG_DEBUG, "Unknown/unsupported chunk %x.\n", sig);
+                av_log(avctx, AV_LOG_DEBUG,
+                       "Unknown/unsupported chunk %"PRIx32".\n", sig);
                 break;
             }
 
@@ -1522,5 +1524,5 @@ AVCodec ff_sanm_decoder = {
     .init           = decode_init,
     .close          = decode_end,
     .decode         = decode_frame,
-    .capabilities   = CODEC_CAP_DR1,
+    .capabilities   = AV_CODEC_CAP_DR1,
 };

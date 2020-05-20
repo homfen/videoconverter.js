@@ -8,20 +8,23 @@
  *  be found in the AUTHORS file in the root of the source tree.
  */
 
+#include <memory>
 #include <string>
 
+#include "./vpx_config.h"
 #include "test/codec_factory.h"
 #include "test/decode_test_driver.h"
 #include "test/ivf_video_source.h"
 #include "test/md5_helper.h"
 #include "test/test_vectors.h"
 #include "test/util.h"
+#if CONFIG_WEBM_IO
 #include "test/webm_video_source.h"
+#endif
 
 namespace {
 
 const int kVideoNameParam = 1;
-const char kVP9TestFile[] = "vp90-2-02-size-lf-1920x1080.webm";
 
 struct ExternalFrameBuffer {
   uint8_t *data;
@@ -33,20 +36,18 @@ struct ExternalFrameBuffer {
 class ExternalFrameBufferList {
  public:
   ExternalFrameBufferList()
-      : num_buffers_(0),
-        ext_fb_list_(NULL) {}
+      : num_buffers_(0), num_used_buffers_(0), ext_fb_list_(NULL) {}
 
   virtual ~ExternalFrameBufferList() {
     for (int i = 0; i < num_buffers_; ++i) {
-      delete [] ext_fb_list_[i].data;
+      delete[] ext_fb_list_[i].data;
     }
-    delete [] ext_fb_list_;
+    delete[] ext_fb_list_;
   }
 
   // Creates the list to hold the external buffers. Returns true on success.
   bool CreateBufferList(int num_buffers) {
-    if (num_buffers < 0)
-      return false;
+    if (num_buffers < 0) return false;
 
     num_buffers_ = num_buffers;
     ext_fb_list_ = new ExternalFrameBuffer[num_buffers_];
@@ -62,16 +63,18 @@ class ExternalFrameBufferList {
   int GetFreeFrameBuffer(size_t min_size, vpx_codec_frame_buffer_t *fb) {
     EXPECT_TRUE(fb != NULL);
     const int idx = FindFreeBufferIndex();
-    if (idx == num_buffers_)
-      return -1;
+    if (idx == num_buffers_) return -1;
 
     if (ext_fb_list_[idx].size < min_size) {
-      delete [] ext_fb_list_[idx].data;
+      delete[] ext_fb_list_[idx].data;
       ext_fb_list_[idx].data = new uint8_t[min_size];
+      memset(ext_fb_list_[idx].data, 0, min_size);
       ext_fb_list_[idx].size = min_size;
     }
 
     SetFrameBuffer(idx, fb);
+
+    num_used_buffers_++;
     return 0;
   }
 
@@ -80,11 +83,10 @@ class ExternalFrameBufferList {
   int GetZeroFrameBuffer(size_t min_size, vpx_codec_frame_buffer_t *fb) {
     EXPECT_TRUE(fb != NULL);
     const int idx = FindFreeBufferIndex();
-    if (idx == num_buffers_)
-      return -1;
+    if (idx == num_buffers_) return -1;
 
     if (ext_fb_list_[idx].size < min_size) {
-      delete [] ext_fb_list_[idx].data;
+      delete[] ext_fb_list_[idx].data;
       ext_fb_list_[idx].data = NULL;
       ext_fb_list_[idx].size = min_size;
     }
@@ -93,29 +95,38 @@ class ExternalFrameBufferList {
     return 0;
   }
 
-  // Marks the external frame buffer that |fb| is pointing too as free.
+  // Marks the external frame buffer that |fb| is pointing to as free.
   // Returns < 0 on an error.
   int ReturnFrameBuffer(vpx_codec_frame_buffer_t *fb) {
-    EXPECT_TRUE(fb != NULL);
+    if (fb == NULL) {
+      EXPECT_TRUE(fb != NULL);
+      return -1;
+    }
     ExternalFrameBuffer *const ext_fb =
-        reinterpret_cast<ExternalFrameBuffer*>(fb->priv);
-    EXPECT_TRUE(ext_fb != NULL);
+        reinterpret_cast<ExternalFrameBuffer *>(fb->priv);
+    if (ext_fb == NULL) {
+      EXPECT_TRUE(ext_fb != NULL);
+      return -1;
+    }
     EXPECT_EQ(1, ext_fb->in_use);
     ext_fb->in_use = 0;
+    num_used_buffers_--;
     return 0;
   }
 
-  // Checks that the ximage data is contained within the external frame buffer
-  // private data passed back in the ximage.
-  void CheckXImageFrameBuffer(const vpx_image_t *img) {
+  // Checks that the vpx_image_t data is contained within the external frame
+  // buffer private data passed back in the vpx_image_t.
+  void CheckImageFrameBuffer(const vpx_image_t *img) {
     if (img->fb_priv != NULL) {
       const struct ExternalFrameBuffer *const ext_fb =
-          reinterpret_cast<ExternalFrameBuffer*>(img->fb_priv);
+          reinterpret_cast<ExternalFrameBuffer *>(img->fb_priv);
 
       ASSERT_TRUE(img->planes[0] >= ext_fb->data &&
                   img->planes[0] < (ext_fb->data + ext_fb->size));
     }
   }
+
+  int num_used_buffers() const { return num_used_buffers_; }
 
  private:
   // Returns the index of the first free frame buffer. Returns |num_buffers_|
@@ -124,8 +135,7 @@ class ExternalFrameBufferList {
     int i;
     // Find a free frame buffer.
     for (i = 0; i < num_buffers_; ++i) {
-      if (!ext_fb_list_[i].in_use)
-        break;
+      if (!ext_fb_list_[i].in_use) break;
     }
     return i;
   }
@@ -142,24 +152,26 @@ class ExternalFrameBufferList {
   }
 
   int num_buffers_;
+  int num_used_buffers_;
   ExternalFrameBuffer *ext_fb_list_;
 };
+
+#if CONFIG_WEBM_IO
 
 // Callback used by libvpx to request the application to return a frame
 // buffer of at least |min_size| in bytes.
 int get_vp9_frame_buffer(void *user_priv, size_t min_size,
                          vpx_codec_frame_buffer_t *fb) {
   ExternalFrameBufferList *const fb_list =
-      reinterpret_cast<ExternalFrameBufferList*>(user_priv);
+      reinterpret_cast<ExternalFrameBufferList *>(user_priv);
   return fb_list->GetFreeFrameBuffer(min_size, fb);
 }
 
 // Callback used by libvpx to tell the application that |fb| is not needed
 // anymore.
-int release_vp9_frame_buffer(void *user_priv,
-                             vpx_codec_frame_buffer_t *fb) {
+int release_vp9_frame_buffer(void *user_priv, vpx_codec_frame_buffer_t *fb) {
   ExternalFrameBufferList *const fb_list =
-      reinterpret_cast<ExternalFrameBufferList*>(user_priv);
+      reinterpret_cast<ExternalFrameBufferList *>(user_priv);
   return fb_list->ReturnFrameBuffer(fb);
 }
 
@@ -167,7 +179,7 @@ int release_vp9_frame_buffer(void *user_priv,
 int get_vp9_zero_frame_buffer(void *user_priv, size_t min_size,
                               vpx_codec_frame_buffer_t *fb) {
   ExternalFrameBufferList *const fb_list =
-      reinterpret_cast<ExternalFrameBufferList*>(user_priv);
+      reinterpret_cast<ExternalFrameBufferList *>(user_priv);
   return fb_list->GetZeroFrameBuffer(min_size, fb);
 }
 
@@ -175,7 +187,7 @@ int get_vp9_zero_frame_buffer(void *user_priv, size_t min_size,
 int get_vp9_one_less_byte_frame_buffer(void *user_priv, size_t min_size,
                                        vpx_codec_frame_buffer_t *fb) {
   ExternalFrameBufferList *const fb_list =
-      reinterpret_cast<ExternalFrameBufferList*>(user_priv);
+      reinterpret_cast<ExternalFrameBufferList *>(user_priv);
   return fb_list->GetFreeFrameBuffer(min_size - 1, fb);
 }
 
@@ -187,19 +199,19 @@ int do_not_release_vp9_frame_buffer(void *user_priv,
   return 0;
 }
 
+#endif  // CONFIG_WEBM_IO
+
 // Class for testing passing in external frame buffers to libvpx.
 class ExternalFrameBufferMD5Test
     : public ::libvpx_test::DecoderTest,
-      public ::libvpx_test::CodecTestWithParam<const char*> {
+      public ::libvpx_test::CodecTestWithParam<const char *> {
  protected:
   ExternalFrameBufferMD5Test()
       : DecoderTest(GET_PARAM(::libvpx_test::kCodecFactoryParam)),
-        md5_file_(NULL),
-        num_buffers_(0) {}
+        md5_file_(NULL), num_buffers_(0) {}
 
   virtual ~ExternalFrameBufferMD5Test() {
-    if (md5_file_ != NULL)
-      fclose(md5_file_);
+    if (md5_file_ != NULL) fclose(md5_file_);
   }
 
   virtual void PreDecodeFrameHook(
@@ -209,15 +221,15 @@ class ExternalFrameBufferMD5Test
       // Have libvpx use frame buffers we create.
       ASSERT_TRUE(fb_list_.CreateBufferList(num_buffers_));
       ASSERT_EQ(VPX_CODEC_OK,
-                decoder->SetFrameBufferFunctions(
-                    GetVP9FrameBuffer, ReleaseVP9FrameBuffer, this));
+                decoder->SetFrameBufferFunctions(GetVP9FrameBuffer,
+                                                 ReleaseVP9FrameBuffer, this));
     }
   }
 
   void OpenMD5File(const std::string &md5_file_name_) {
     md5_file_ = libvpx_test::OpenTestDataFile(md5_file_name_);
-    ASSERT_TRUE(md5_file_ != NULL) << "Md5 file open failed. Filename: "
-        << md5_file_name_;
+    ASSERT_TRUE(md5_file_ != NULL)
+        << "Md5 file open failed. Filename: " << md5_file_name_;
   }
 
   virtual void DecompressedFrameHook(const vpx_image_t &img,
@@ -245,7 +257,7 @@ class ExternalFrameBufferMD5Test
   static int GetVP9FrameBuffer(void *user_priv, size_t min_size,
                                vpx_codec_frame_buffer_t *fb) {
     ExternalFrameBufferMD5Test *const md5Test =
-        reinterpret_cast<ExternalFrameBufferMD5Test*>(user_priv);
+        reinterpret_cast<ExternalFrameBufferMD5Test *>(user_priv);
     return md5Test->fb_list_.GetFreeFrameBuffer(min_size, fb);
   }
 
@@ -254,7 +266,7 @@ class ExternalFrameBufferMD5Test
   static int ReleaseVP9FrameBuffer(void *user_priv,
                                    vpx_codec_frame_buffer_t *fb) {
     ExternalFrameBufferMD5Test *const md5Test =
-        reinterpret_cast<ExternalFrameBufferMD5Test*>(user_priv);
+        reinterpret_cast<ExternalFrameBufferMD5Test *>(user_priv);
     return md5Test->fb_list_.ReturnFrameBuffer(fb);
   }
 
@@ -267,13 +279,14 @@ class ExternalFrameBufferMD5Test
   ExternalFrameBufferList fb_list_;
 };
 
+#if CONFIG_WEBM_IO
+const char kVP9TestFile[] = "vp90-2-02-size-lf-1920x1080.webm";
+const char kVP9NonRefTestFile[] = "vp90-2-22-svc_1280x720_1.webm";
+
 // Class for testing passing in external frame buffers to libvpx.
 class ExternalFrameBufferTest : public ::testing::Test {
  protected:
-  ExternalFrameBufferTest()
-      : video_(NULL),
-        decoder_(NULL),
-        num_buffers_(0) {}
+  ExternalFrameBufferTest() : video_(NULL), decoder_(NULL), num_buffers_(0) {}
 
   virtual void SetUp() {
     video_ = new libvpx_test::WebMVideoSource(kVP9TestFile);
@@ -281,20 +294,21 @@ class ExternalFrameBufferTest : public ::testing::Test {
     video_->Init();
     video_->Begin();
 
-    vpx_codec_dec_cfg_t cfg = {0};
+    vpx_codec_dec_cfg_t cfg = vpx_codec_dec_cfg_t();
     decoder_ = new libvpx_test::VP9Decoder(cfg, 0);
     ASSERT_TRUE(decoder_ != NULL);
   }
 
   virtual void TearDown() {
     delete decoder_;
+    decoder_ = NULL;
     delete video_;
+    video_ = NULL;
   }
 
   // Passes the external frame buffer information to libvpx.
   vpx_codec_err_t SetFrameBufferFunctions(
-      int num_buffers,
-      vpx_get_frame_buffer_cb_fn_t cb_get,
+      int num_buffers, vpx_get_frame_buffer_cb_fn_t cb_get,
       vpx_release_frame_buffer_cb_fn_t cb_release) {
     if (num_buffers > 0) {
       num_buffers_ = num_buffers;
@@ -308,8 +322,7 @@ class ExternalFrameBufferTest : public ::testing::Test {
     const vpx_codec_err_t res =
         decoder_->DecodeFrame(video_->cxdata(), video_->frame_size());
     CheckDecodedFrames();
-    if (res == VPX_CODEC_OK)
-      video_->Next();
+    if (res == VPX_CODEC_OK) video_->Next();
     return res;
   }
 
@@ -317,21 +330,19 @@ class ExternalFrameBufferTest : public ::testing::Test {
     for (; video_->cxdata() != NULL; video_->Next()) {
       const vpx_codec_err_t res =
           decoder_->DecodeFrame(video_->cxdata(), video_->frame_size());
-      if (res != VPX_CODEC_OK)
-        return res;
+      if (res != VPX_CODEC_OK) return res;
       CheckDecodedFrames();
     }
     return VPX_CODEC_OK;
   }
 
- private:
   void CheckDecodedFrames() {
     libvpx_test::DxDataIterator dec_iter = decoder_->GetDxData();
     const vpx_image_t *img = NULL;
 
     // Get decompressed data
     while ((img = dec_iter.Next()) != NULL) {
-      fb_list_.CheckXImageFrameBuffer(img);
+      fb_list_.CheckImageFrameBuffer(img);
     }
   }
 
@@ -341,6 +352,26 @@ class ExternalFrameBufferTest : public ::testing::Test {
   ExternalFrameBufferList fb_list_;
 };
 
+class ExternalFrameBufferNonRefTest : public ExternalFrameBufferTest {
+ protected:
+  virtual void SetUp() {
+    video_ = new libvpx_test::WebMVideoSource(kVP9NonRefTestFile);
+    ASSERT_TRUE(video_ != NULL);
+    video_->Init();
+    video_->Begin();
+
+    vpx_codec_dec_cfg_t cfg = vpx_codec_dec_cfg_t();
+    decoder_ = new libvpx_test::VP9Decoder(cfg, 0);
+    ASSERT_TRUE(decoder_ != NULL);
+  }
+
+  virtual void CheckFrameBufferRelease() {
+    TearDown();
+    ASSERT_EQ(0, fb_list_.num_used_buffers());
+  }
+};
+#endif  // CONFIG_WEBM_IO
+
 // This test runs through the set of test vectors, and decodes them.
 // Libvpx will call into the application to allocate a frame buffer when
 // needed. The md5 checksums are computed for each frame in the video file.
@@ -348,7 +379,6 @@ class ExternalFrameBufferTest : public ::testing::Test {
 // Otherwise, the test failed.
 TEST_P(ExternalFrameBufferMD5Test, ExtFBMD5Match) {
   const std::string filename = GET_PARAM(kVideoNameParam);
-  libvpx_test::CompressedVideoSource *video = NULL;
 
   // Number of buffers equals #VP9_MAXIMUM_REF_BUFFERS +
   // #VPX_MAXIMUM_WORK_BUFFERS + four jitter buffers.
@@ -363,12 +393,19 @@ TEST_P(ExternalFrameBufferMD5Test, ExtFBMD5Match) {
 #endif
 
   // Open compressed video file.
+  std::unique_ptr<libvpx_test::CompressedVideoSource> video;
   if (filename.substr(filename.length() - 3, 3) == "ivf") {
-    video = new libvpx_test::IVFVideoSource(filename);
+    video.reset(new libvpx_test::IVFVideoSource(filename));
   } else {
-    video = new libvpx_test::WebMVideoSource(filename);
+#if CONFIG_WEBM_IO
+    video.reset(new libvpx_test::WebMVideoSource(filename));
+#else
+    fprintf(stderr, "WebM IO is disabled, skipping test vector %s\n",
+            filename.c_str());
+    return;
+#endif
   }
-  ASSERT_TRUE(video != NULL);
+  ASSERT_TRUE(video.get() != NULL);
   video->Init();
 
   // Construct md5 file name.
@@ -376,17 +413,17 @@ TEST_P(ExternalFrameBufferMD5Test, ExtFBMD5Match) {
   OpenMD5File(md5_filename);
 
   // Decode frame, and check the md5 matching.
-  ASSERT_NO_FATAL_FAILURE(RunLoop(video));
-  delete video;
+  ASSERT_NO_FATAL_FAILURE(RunLoop(video.get()));
 }
 
+#if CONFIG_WEBM_IO
 TEST_F(ExternalFrameBufferTest, MinFrameBuffers) {
   // Minimum number of external frame buffers for VP9 is
   // #VP9_MAXIMUM_REF_BUFFERS + #VPX_MAXIMUM_WORK_BUFFERS.
   const int num_buffers = VP9_MAXIMUM_REF_BUFFERS + VPX_MAXIMUM_WORK_BUFFERS;
   ASSERT_EQ(VPX_CODEC_OK,
-            SetFrameBufferFunctions(
-                num_buffers, get_vp9_frame_buffer, release_vp9_frame_buffer));
+            SetFrameBufferFunctions(num_buffers, get_vp9_frame_buffer,
+                                    release_vp9_frame_buffer));
   ASSERT_EQ(VPX_CODEC_OK, DecodeRemainingFrames());
 }
 
@@ -397,8 +434,8 @@ TEST_F(ExternalFrameBufferTest, EightJitterBuffers) {
   const int num_buffers =
       VP9_MAXIMUM_REF_BUFFERS + VPX_MAXIMUM_WORK_BUFFERS + jitter_buffers;
   ASSERT_EQ(VPX_CODEC_OK,
-            SetFrameBufferFunctions(
-                num_buffers, get_vp9_frame_buffer, release_vp9_frame_buffer));
+            SetFrameBufferFunctions(num_buffers, get_vp9_frame_buffer,
+                                    release_vp9_frame_buffer));
   ASSERT_EQ(VPX_CODEC_OK, DecodeRemainingFrames());
 }
 
@@ -408,9 +445,11 @@ TEST_F(ExternalFrameBufferTest, NotEnoughBuffers) {
   // only use 5 frame buffers at one time.
   const int num_buffers = 2;
   ASSERT_EQ(VPX_CODEC_OK,
-            SetFrameBufferFunctions(
-                num_buffers, get_vp9_frame_buffer, release_vp9_frame_buffer));
+            SetFrameBufferFunctions(num_buffers, get_vp9_frame_buffer,
+                                    release_vp9_frame_buffer));
   ASSERT_EQ(VPX_CODEC_OK, DecodeOneFrame());
+  // Only run this on long clips. Decoding a very short clip will return
+  // VPX_CODEC_OK even with only 2 buffers.
   ASSERT_EQ(VPX_CODEC_MEM_ERROR, DecodeRemainingFrames());
 }
 
@@ -433,18 +472,17 @@ TEST_F(ExternalFrameBufferTest, NullRealloc) {
 
 TEST_F(ExternalFrameBufferTest, ReallocOneLessByte) {
   const int num_buffers = VP9_MAXIMUM_REF_BUFFERS + VPX_MAXIMUM_WORK_BUFFERS;
-  ASSERT_EQ(VPX_CODEC_OK,
-            SetFrameBufferFunctions(
-                num_buffers, get_vp9_one_less_byte_frame_buffer,
-                release_vp9_frame_buffer));
+  ASSERT_EQ(VPX_CODEC_OK, SetFrameBufferFunctions(
+                              num_buffers, get_vp9_one_less_byte_frame_buffer,
+                              release_vp9_frame_buffer));
   ASSERT_EQ(VPX_CODEC_MEM_ERROR, DecodeOneFrame());
 }
 
 TEST_F(ExternalFrameBufferTest, NullGetFunction) {
   const int num_buffers = VP9_MAXIMUM_REF_BUFFERS + VPX_MAXIMUM_WORK_BUFFERS;
-  ASSERT_EQ(VPX_CODEC_INVALID_PARAM,
-            SetFrameBufferFunctions(num_buffers, NULL,
-                                    release_vp9_frame_buffer));
+  ASSERT_EQ(
+      VPX_CODEC_INVALID_PARAM,
+      SetFrameBufferFunctions(num_buffers, NULL, release_vp9_frame_buffer));
 }
 
 TEST_F(ExternalFrameBufferTest, NullReleaseFunction) {
@@ -457,12 +495,23 @@ TEST_F(ExternalFrameBufferTest, SetAfterDecode) {
   const int num_buffers = VP9_MAXIMUM_REF_BUFFERS + VPX_MAXIMUM_WORK_BUFFERS;
   ASSERT_EQ(VPX_CODEC_OK, DecodeOneFrame());
   ASSERT_EQ(VPX_CODEC_ERROR,
-            SetFrameBufferFunctions(
-                num_buffers, get_vp9_frame_buffer, release_vp9_frame_buffer));
+            SetFrameBufferFunctions(num_buffers, get_vp9_frame_buffer,
+                                    release_vp9_frame_buffer));
 }
 
-VP9_INSTANTIATE_TEST_CASE(ExternalFrameBufferMD5Test,
-                          ::testing::ValuesIn(libvpx_test::kVP9TestVectors,
-                                              libvpx_test::kVP9TestVectors +
-                                              libvpx_test::kNumVP9TestVectors));
+TEST_F(ExternalFrameBufferNonRefTest, ReleaseNonRefFrameBuffer) {
+  const int num_buffers = VP9_MAXIMUM_REF_BUFFERS + VPX_MAXIMUM_WORK_BUFFERS;
+  ASSERT_EQ(VPX_CODEC_OK,
+            SetFrameBufferFunctions(num_buffers, get_vp9_frame_buffer,
+                                    release_vp9_frame_buffer));
+  ASSERT_EQ(VPX_CODEC_OK, DecodeRemainingFrames());
+  CheckFrameBufferRelease();
+}
+#endif  // CONFIG_WEBM_IO
+
+VP9_INSTANTIATE_TEST_CASE(
+    ExternalFrameBufferMD5Test,
+    ::testing::ValuesIn(libvpx_test::kVP9TestVectors,
+                        libvpx_test::kVP9TestVectors +
+                            libvpx_test::kNumVP9TestVectors));
 }  // namespace

@@ -42,6 +42,7 @@ enum RTSPLowerTransport {
     RTSP_LOWER_TRANSPORT_HTTP = 8,          /**< HTTP tunneled - not a proper
                                                  transport mode as such,
                                                  only for use via AVOptions */
+    RTSP_LOWER_TRANSPORT_HTTPS,             /**< HTTPS tunneled */
     RTSP_LOWER_TRANSPORT_CUSTOM = 16,       /**< Custom IO - not a public
                                                  option for lower_transport_mask,
                                                  but set in the SDP demuxer based
@@ -70,6 +71,7 @@ enum RTSPControlTransport {
 };
 
 #define RTSP_DEFAULT_PORT   554
+#define RTSPS_DEFAULT_PORT  322
 #define RTSP_MAX_TRANSPORTS 8
 #define RTSP_TCP_MAX_PACKET_SIZE 1472
 #define RTSP_DEFAULT_NB_AUDIO_CHANNELS 1
@@ -351,6 +353,7 @@ typedef struct RTSPState {
      * Polling array for udp
      */
     struct pollfd *p;
+    int max_p;
 
     /**
      * Whether the server supports the GET_PARAMETER method.
@@ -404,6 +407,10 @@ typedef struct RTSPState {
      * User-Agent string
      */
     char *user_agent;
+
+    char default_lang[4];
+    int buffer_size;
+    int pkt_size;
 } RTSPState;
 
 #define RTSP_FLAG_FILTER_SRC  0x1    /**< Filter incoming UDP packets -
@@ -453,7 +460,7 @@ typedef struct RTSPStream {
     /** The following are used for dynamic protocols (rtpdec_*.c/rdt.c) */
     //@{
     /** handler structure */
-    RTPDynamicProtocolHandler *dynamic_handler;
+    const RTPDynamicProtocolHandler *dynamic_handler;
 
     /** private data associated with the dynamic protocol */
     PayloadContext *dynamic_protocol_context;
@@ -462,11 +469,15 @@ typedef struct RTSPStream {
     /** Enable sending RTCP feedback messages according to RFC 4585 */
     int feedback;
 
+    /** SSRC for this stream, to allow identifying RTCP packets before the first RTP packet */
+    uint32_t ssrc;
+
     char crypto_suite[40];
     char crypto_params[100];
 } RTSPStream;
 
-void ff_rtsp_parse_line(RTSPMessageHeader *reply, const char *buf,
+void ff_rtsp_parse_line(AVFormatContext *s,
+                        RTSPMessageHeader *reply, const char *buf,
                         RTSPState *rt, const char *method);
 
 /**

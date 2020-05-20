@@ -182,7 +182,7 @@ static void ff_xvmc_decode_mb(struct MpegEncContext *s)
         return;
     }
 
-    // from MPV_decode_mb(), update DC predictors for P macroblocks
+    // from ff_mpv_reconstruct_mb(), update DC predictors for P macroblocks
     if (!s->mb_intra) {
         s->last_dc[0] =
         s->last_dc[1] =
@@ -298,7 +298,7 @@ static void ff_xvmc_decode_mb(struct MpegEncContext *s)
             cbp++;
     }
 
-    if (s->flags & CODEC_FLAG_GRAY) {
+    if (s->avctx->flags & AV_CODEC_FLAG_GRAY) {
         if (s->mb_intra) {                                   // intra frames are always full chroma blocks
             for (i = 4; i < blocks_per_mb; i++) {
                 memset(s->pblocks[i], 0, sizeof(*s->pblocks[i]));  // so we need to clear them
@@ -348,7 +348,7 @@ static void ff_xvmc_decode_mb(struct MpegEncContext *s)
 }
 
 #if CONFIG_MPEG1_XVMC_HWACCEL
-AVHWAccel ff_mpeg1_xvmc_hwaccel = {
+const AVHWAccel ff_mpeg1_xvmc_hwaccel = {
     .name           = "mpeg1_xvmc",
     .type           = AVMEDIA_TYPE_VIDEO,
     .id             = AV_CODEC_ID_MPEG1VIDEO,
@@ -362,7 +362,7 @@ AVHWAccel ff_mpeg1_xvmc_hwaccel = {
 #endif
 
 #if CONFIG_MPEG2_XVMC_HWACCEL
-AVHWAccel ff_mpeg2_xvmc_hwaccel = {
+const AVHWAccel ff_mpeg2_xvmc_hwaccel = {
     .name           = "mpeg2_xvmc",
     .type           = AVMEDIA_TYPE_VIDEO,
     .id             = AV_CODEC_ID_MPEG2VIDEO,

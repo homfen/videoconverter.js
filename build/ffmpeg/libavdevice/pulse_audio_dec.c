@@ -23,10 +23,13 @@
 
 #include <pulse/rtclock.h>
 #include <pulse/error.h>
-#include "libavformat/avformat.h"
-#include "libavformat/internal.h"
+
+#include "libavutil/internal.h"
 #include "libavutil/opt.h"
 #include "libavutil/time.h"
+
+#include "libavformat/avformat.h"
+#include "libavformat/internal.h"
 #include "pulse_audio_common.h"
 #include "timefilter.h"
 
@@ -48,6 +51,7 @@ typedef struct PulseData {
 
     TimeFilter *timefilter;
     int last_period;
+    int wallclock;
 } PulseData;
 
 
@@ -57,7 +61,7 @@ typedef struct PulseData {
             rerror = AVERROR_EXTERNAL;                          \
             goto label;                                         \
         }                                                       \
-    } while(0);
+    } while (0)
 
 #define CHECK_DEAD_GOTO(p, rerror, label)                               \
     do {                                                                \
@@ -66,7 +70,7 @@ typedef struct PulseData {
             rerror = AVERROR_EXTERNAL;                                  \
             goto label;                                                 \
         }                                                               \
-    } while(0);
+    } while (0)
 
 static void context_state_cb(pa_context *c, void *userdata) {
     PulseData *p = userdata;
@@ -144,6 +148,9 @@ static av_cold int pulse_read_header(AVFormatContext *s)
                                 pd->channels };
 
     pa_buffer_attr attr = { -1 };
+    pa_channel_map cmap;
+
+    pa_channel_map_init_extend(&cmap, pd->channels, PA_CHANNEL_MAP_WAVEEX);
 
     st = avformat_new_stream(s, NULL);
 
@@ -154,8 +161,8 @@ static av_cold int pulse_read_header(AVFormatContext *s)
 
     attr.fragsize = pd->fragment_size;
 
-    if (strcmp(s->filename, "default"))
-        device = s->filename;
+    if (s->url[0] != '\0' && strcmp(s->url, "default"))
+        device = s->url;
 
     if (!(pd->mainloop = pa_threaded_mainloop_new())) {
         pulse_close(s);
@@ -198,7 +205,7 @@ static av_cold int pulse_read_header(AVFormatContext *s)
         pa_threaded_mainloop_wait(pd->mainloop);
     }
 
-    if (!(pd->stream = pa_stream_new(pd->context, pd->stream_name, &ss, NULL))) {
+    if (!(pd->stream = pa_stream_new(pd->context, pd->stream_name, &ss, &cmap))) {
         ret = AVERROR(pa_context_errno(pd->context));
         goto unlock_and_fail;
     }
@@ -238,10 +245,10 @@ static av_cold int pulse_read_header(AVFormatContext *s)
     pa_threaded_mainloop_unlock(pd->mainloop);
 
     /* take real parameters */
-    st->codec->codec_type  = AVMEDIA_TYPE_AUDIO;
-    st->codec->codec_id    = codec_id;
-    st->codec->sample_rate = pd->sample_rate;
-    st->codec->channels    = pd->channels;
+    st->codecpar->codec_type  = AVMEDIA_TYPE_AUDIO;
+    st->codecpar->codec_id    = codec_id;
+    st->codecpar->sample_rate = pd->sample_rate;
+    st->codecpar->channels    = pd->channels;
     avpriv_set_pts_info(st, 64, 1, 1000000);  /* 64 bits pts in us */
 
     pd->timefilter = ff_timefilter_new(1000000.0 / pd->sample_rate,
@@ -311,7 +318,8 @@ static int pulse_read_packet(AVFormatContext *s, AVPacket *pkt)
             dts += latency;
         } else
             dts -= latency;
-        pkt->pts = ff_timefilter_update(pd->timefilter, dts, pd->last_period);
+        if (pd->wallclock)
+            pkt->pts = ff_timefilter_update(pd->timefilter, dts, pd->last_period);
 
         pd->last_period = frame_duration;
     } else {
@@ -346,6 +354,7 @@ static const AVOption options[] = {
     { "channels",      "set number of audio channels",                      OFFSET(channels),      AV_OPT_TYPE_INT,    {.i64 = 2},        1, INT_MAX, D },
     { "frame_size",    "set number of bytes per frame",                     OFFSET(frame_size),    AV_OPT_TYPE_INT,    {.i64 = 1024},     1, INT_MAX, D },
     { "fragment_size", "set buffering size, affects latency and cpu usage", OFFSET(fragment_size), AV_OPT_TYPE_INT,    {.i64 = -1},      -1, INT_MAX, D },
+    { "wallclock",     "set the initial pts using the current time",     OFFSET(wallclock),     AV_OPT_TYPE_INT,    {.i64 = 1},       -1, 1, D },
     { NULL },
 };
 

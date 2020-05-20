@@ -27,6 +27,7 @@
 #include "avformat.h"
 #include "internal.h"
 #include "subtitles.h"
+#include "avio_internal.h"
 #include "libavcodec/internal.h"
 #include "libavutil/avstring.h"
 #include "libavutil/bprint.h"
@@ -36,7 +37,7 @@ typedef struct {
     FFDemuxSubtitlesQueue q;
 } SubViewerContext;
 
-static int subviewer_probe(AVProbeData *p)
+static int subviewer_probe(const AVProbeData *p)
 {
     char c;
     const unsigned char *ptr = p->buf;
@@ -78,13 +79,18 @@ static int subviewer_read_header(AVFormatContext *s)
 
     if (!st)
         return AVERROR(ENOMEM);
+    res = ffio_ensure_seekback(s->pb, 3);
+    if (res < 0)
+        return res;
+    if (avio_rb24(s->pb) != 0xefbbbf)
+        avio_seek(s->pb, -3, SEEK_CUR);
     avpriv_set_pts_info(st, 64, 1, 100);
-    st->codec->codec_type = AVMEDIA_TYPE_SUBTITLE;
-    st->codec->codec_id   = AV_CODEC_ID_SUBVIEWER;
+    st->codecpar->codec_type = AVMEDIA_TYPE_SUBTITLE;
+    st->codecpar->codec_id   = AV_CODEC_ID_SUBVIEWER;
 
     av_bprint_init(&header, 0, AV_BPRINT_SIZE_UNLIMITED);
 
-    while (!url_feof(s->pb)) {
+    while (!avio_feof(s->pb)) {
         char line[2048];
         int64_t pos = 0;
         int len = ff_get_line(s->pb, line, sizeof(line));
@@ -101,11 +107,11 @@ static int subviewer_read_header(AVFormatContext *s)
                 strstr(line, "[FONT]") || strstr(line, "[STYLE]"))
                 continue;
 
-            if (!st->codec->extradata) { // header not finalized yet
+            if (!st->codecpar->extradata) { // header not finalized yet
                 av_bprintf(&header, "%s\n", line);
                 if (!strncmp(line, "[END INFORMATION]", 17) || !strncmp(line, "[SUBTITLE]", 10)) {
                     /* end of header */
-                    res = avpriv_bprint_to_extradata(st->codec, &header);
+                    res = ff_bprint_to_codecpar_extradata(st->codecpar, &header);
                     if (res < 0)
                         goto end;
                 } else if (strncmp(line, "[INFORMATION]", 13)) {
@@ -153,7 +159,7 @@ static int subviewer_read_header(AVFormatContext *s)
         }
     }
 
-    ff_subtitles_queue_finalize(&subviewer->q);
+    ff_subtitles_queue_finalize(s, &subviewer->q);
 
 end:
     av_bprint_finalize(&header, NULL);

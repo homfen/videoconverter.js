@@ -1,4 +1,4 @@
-/*! \page usage_encode Encode
+/*! \page usage_encode Encoding
 
     The vpx_codec_encode() function is at the core of the encode loop. It
     processes raw images passed by the application, producing packets of
@@ -8,6 +8,8 @@
     \ref usage_deadline.
 
 
+    \if samples
     \ref samples
+    \endif
 
 */

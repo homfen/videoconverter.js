@@ -33,7 +33,7 @@ void ff_audio_interleave_close(AVFormatContext *s)
         AVStream *st = s->streams[i];
         AudioInterleaveContext *aic = st->priv_data;
 
-        if (st->codec->codec_type == AVMEDIA_TYPE_AUDIO)
+        if (st->codecpar->codec_type == AVMEDIA_TYPE_AUDIO)
             av_fifo_freep(&aic->fifo);
     }
 }
@@ -55,9 +55,9 @@ int ff_audio_interleave_init(AVFormatContext *s,
         AVStream *st = s->streams[i];
         AudioInterleaveContext *aic = st->priv_data;
 
-        if (st->codec->codec_type == AVMEDIA_TYPE_AUDIO) {
-            aic->sample_size = (st->codec->channels *
-                                av_get_bits_per_sample(st->codec->codec_id)) / 8;
+        if (st->codecpar->codec_type == AVMEDIA_TYPE_AUDIO) {
+            aic->sample_size = (st->codecpar->channels *
+                                av_get_bits_per_sample(st->codecpar->codec_id)) / 8;
             if (!aic->sample_size) {
                 av_log(s, AV_LOG_ERROR, "could not compute sample size\n");
                 return AVERROR(EINVAL);
@@ -80,14 +80,19 @@ static int interleave_new_audio_packet(AVFormatContext *s, AVPacket *pkt,
 {
     AVStream *st = s->streams[stream_index];
     AudioInterleaveContext *aic = st->priv_data;
-
-    int size = FFMIN(av_fifo_size(aic->fifo), *aic->samples * aic->sample_size);
+    int ret;
+    int frame_size = *aic->samples * aic->sample_size;
+    int size = FFMIN(av_fifo_size(aic->fifo), frame_size);
     if (!size || (!flush && size == av_fifo_size(aic->fifo)))
         return 0;
 
-    if (av_new_packet(pkt, size) < 0)
-        return AVERROR(ENOMEM);
+    ret = av_new_packet(pkt, frame_size);
+    if (ret < 0)
+        return ret;
     av_fifo_generic_read(aic->fifo, pkt->data, size, NULL);
+
+    if (size < pkt->size)
+        memset(pkt->data + size, 0, pkt->size - size);
 
     pkt->dts = pkt->pts = aic->dts;
     pkt->duration = av_rescale_q(*aic->samples, st->time_base, aic->time_base);
@@ -98,19 +103,19 @@ static int interleave_new_audio_packet(AVFormatContext *s, AVPacket *pkt,
     if (!*aic->samples)
         aic->samples = aic->samples_per_frame;
 
-    return size;
+    return pkt->size;
 }
 
 int ff_audio_rechunk_interleave(AVFormatContext *s, AVPacket *out, AVPacket *pkt, int flush,
                         int (*get_packet)(AVFormatContext *, AVPacket *, AVPacket *, int),
                         int (*compare_ts)(AVFormatContext *, AVPacket *, AVPacket *))
 {
-    int i;
+    int i, ret;
 
     if (pkt) {
         AVStream *st = s->streams[pkt->stream_index];
         AudioInterleaveContext *aic = st->priv_data;
-        if (st->codec->codec_type == AVMEDIA_TYPE_AUDIO) {
+        if (st->codecpar->codec_type == AVMEDIA_TYPE_AUDIO) {
             unsigned new_size = av_fifo_size(aic->fifo) + pkt->size;
             if (new_size > aic->fifo_size) {
                 if (av_fifo_realloc2(aic->fifo, new_size) < 0)
@@ -119,12 +124,10 @@ int ff_audio_rechunk_interleave(AVFormatContext *s, AVPacket *out, AVPacket *pkt
             }
             av_fifo_generic_write(aic->fifo, pkt->data, pkt->size, NULL);
         } else {
-            int ret;
             // rewrite pts and dts to be decoded time line position
             pkt->pts = pkt->dts = aic->dts;
             aic->dts += pkt->duration;
-            ret = ff_interleave_add_packet(s, pkt, compare_ts);
-            if (ret < 0)
+            if ((ret = ff_interleave_add_packet(s, pkt, compare_ts)) < 0)
                 return ret;
         }
         pkt = NULL;
@@ -132,12 +135,10 @@ int ff_audio_rechunk_interleave(AVFormatContext *s, AVPacket *out, AVPacket *pkt
 
     for (i = 0; i < s->nb_streams; i++) {
         AVStream *st = s->streams[i];
-        if (st->codec->codec_type == AVMEDIA_TYPE_AUDIO) {
-            AVPacket new_pkt;
-            int ret;
+        if (st->codecpar->codec_type == AVMEDIA_TYPE_AUDIO) {
+            AVPacket new_pkt = { 0 };
             while ((ret = interleave_new_audio_packet(s, &new_pkt, i, flush)) > 0) {
-                ret = ff_interleave_add_packet(s, &new_pkt, compare_ts);
-                if (ret < 0)
+                if ((ret = ff_interleave_add_packet(s, &new_pkt, compare_ts)) < 0)
                     return ret;
             }
             if (ret < 0)

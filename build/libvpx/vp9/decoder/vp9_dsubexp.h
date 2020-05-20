@@ -8,20 +8,19 @@
  *  be found in the AUTHORS file in the root of the source tree.
  */
 
+#ifndef VPX_VP9_DECODER_VP9_DSUBEXP_H_
+#define VPX_VP9_DECODER_VP9_DSUBEXP_H_
 
-#ifndef VP9_DECODER_VP9_DSUBEXP_H_
-#define VP9_DECODER_VP9_DSUBEXP_H_
-
-#include "vp9/decoder/vp9_reader.h"
+#include "vpx_dsp/bitreader.h"
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-void vp9_diff_update_prob(vp9_reader *r, vp9_prob* p);
+void vp9_diff_update_prob(vpx_reader *r, vpx_prob *p);
 
 #ifdef __cplusplus
 }  // extern "C"
 #endif
 
-#endif  // VP9_DECODER_VP9_DSUBEXP_H_
+#endif  // VPX_VP9_DECODER_VP9_DSUBEXP_H_

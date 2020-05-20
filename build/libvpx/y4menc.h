@@ -8,8 +8,8 @@
  *  be found in the AUTHORS file in the root of the source tree.
  */
 
-#ifndef Y4MENC_H_
-#define Y4MENC_H_
+#ifndef VPX_Y4MENC_H_
+#define VPX_Y4MENC_H_
 
 #include "./tools_common.h"
 
@@ -23,11 +23,11 @@ extern "C" {
 
 int y4m_write_file_header(char *buf, size_t len, int width, int height,
                           const struct VpxRational *framerate,
-                          vpx_img_fmt_t fmt);
+                          vpx_img_fmt_t fmt, unsigned int bit_depth);
 int y4m_write_frame_header(char *buf, size_t len);
 
 #ifdef __cplusplus
 }  // extern "C"
 #endif
 
-#endif  // Y4MENC_H_
+#endif  // VPX_Y4MENC_H_

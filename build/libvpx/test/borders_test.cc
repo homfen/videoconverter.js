@@ -17,8 +17,9 @@
 
 namespace {
 
-class BordersTest : public ::libvpx_test::EncoderTest,
-    public ::libvpx_test::CodecTestWithParam<libvpx_test::TestMode> {
+class BordersTest
+    : public ::libvpx_test::EncoderTest,
+      public ::libvpx_test::CodecTestWithParam<libvpx_test::TestMode> {
  protected:
   BordersTest() : EncoderTest(GET_PARAM(0)) {}
   virtual ~BordersTest() {}
@@ -30,7 +31,7 @@ class BordersTest : public ::libvpx_test::EncoderTest,
 
   virtual void PreEncodeFrameHook(::libvpx_test::VideoSource *video,
                                   ::libvpx_test::Encoder *encoder) {
-    if (video->frame() == 1) {
+    if (video->frame() == 0) {
       encoder->Control(VP8E_SET_CPUUSED, 1);
       encoder->Control(VP8E_SET_ENABLEAUTOALTREF, 1);
       encoder->Control(VP8E_SET_ARNR_MAXFRAMES, 7);
@@ -52,7 +53,7 @@ TEST_P(BordersTest, TestEncodeHighBitrate) {
   // extend into the border and test the border condition.
   cfg_.g_lag_in_frames = 25;
   cfg_.rc_2pass_vbr_minsection_pct = 5;
-  cfg_.rc_2pass_vbr_minsection_pct = 2000;
+  cfg_.rc_2pass_vbr_maxsection_pct = 2000;
   cfg_.rc_target_bitrate = 2000;
   cfg_.rc_max_quantizer = 10;
 
@@ -78,6 +79,6 @@ TEST_P(BordersTest, TestLowBitrate) {
   ASSERT_NO_FATAL_FAILURE(RunLoop(&video));
 }
 
-VP9_INSTANTIATE_TEST_CASE(BordersTest, ::testing::Values(
-    ::libvpx_test::kTwoPassGood));
+VP9_INSTANTIATE_TEST_CASE(BordersTest,
+                          ::testing::Values(::libvpx_test::kTwoPassGood));
 }  // namespace

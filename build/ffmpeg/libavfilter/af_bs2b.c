@@ -32,6 +32,8 @@
 #include "formats.h"
 #include "internal.h"
 
+typedef void (*filter_func)(t_bs2bdp bs2bdp, uint8_t *sample, int n);
+
 typedef struct Bs2bContext {
     const AVClass *class;
 
@@ -41,13 +43,13 @@ typedef struct Bs2bContext {
 
     t_bs2bdp bs2bp;
 
-    void (*filter)(t_bs2bdp bs2bdp, uint8_t *sample, int n);
+    filter_func filter;
 } Bs2bContext;
 
 #define OFFSET(x) offsetof(Bs2bContext, x)
-#define A AV_OPT_FLAG_AUDIO_PARAM
+#define A AV_OPT_FLAG_AUDIO_PARAM | AV_OPT_FLAG_FILTERING_PARAM
 
-static const AVOption options[] = {
+static const AVOption bs2b_options[] = {
     { "profile", "Apply a pre-defined crossfeed level",
             OFFSET(profile), AV_OPT_TYPE_INT, { .i64 = BS2B_DEFAULT_CLEVEL }, 0, INT_MAX, A, "profile" },
         { "default", "default profile", 0, AV_OPT_TYPE_CONST, { .i64 = BS2B_DEFAULT_CLEVEL }, 0, 0, A, "profile" },
@@ -60,12 +62,7 @@ static const AVOption options[] = {
     { NULL },
 };
 
-static const AVClass bs2b_class = {
-    .class_name = "bs2b filter",
-    .item_name  = av_default_item_name,
-    .option     = options,
-    .version    = LIBAVUTIL_VERSION_INT,
-};
+AVFILTER_DEFINE_CLASS(bs2b);
 
 static av_cold int init(AVFilterContext *ctx)
 {
@@ -106,22 +103,25 @@ static int query_formats(AVFilterContext *ctx)
         AV_SAMPLE_FMT_DBL,
         AV_SAMPLE_FMT_NONE,
     };
+    int ret;
 
     if (ff_add_channel_layout(&layouts, AV_CH_LAYOUT_STEREO) != 0)
         return AVERROR(ENOMEM);
-    ff_set_common_channel_layouts(ctx, layouts);
+    ret = ff_set_common_channel_layouts(ctx, layouts);
+    if (ret < 0)
+        return ret;
 
     formats = ff_make_format_list(sample_fmts);
     if (!formats)
         return AVERROR(ENOMEM);
-    ff_set_common_formats(ctx, formats);
+    ret = ff_set_common_formats(ctx, formats);
+    if (ret < 0)
+        return ret;
 
     formats = ff_all_samplerates();
     if (!formats)
         return AVERROR(ENOMEM);
-    ff_set_common_samplerates(ctx, formats);
-
-    return 0;
+    return ff_set_common_samplerates(ctx, formats);
 }
 
 static int filter_frame(AVFilterLink *inlink, AVFrame *frame)
@@ -135,9 +135,11 @@ static int filter_frame(AVFilterLink *inlink, AVFrame *frame)
     if (av_frame_is_writable(frame)) {
         out_frame = frame;
     } else {
-        out_frame = ff_get_audio_buffer(inlink, frame->nb_samples);
-        if (!out_frame)
+        out_frame = ff_get_audio_buffer(outlink, frame->nb_samples);
+        if (!out_frame) {
+            av_frame_free(&frame);
             return AVERROR(ENOMEM);
+        }
         av_frame_copy(out_frame, frame);
         ret = av_frame_copy_props(out_frame, frame);
         if (ret < 0) {
@@ -165,19 +167,19 @@ static int config_output(AVFilterLink *outlink)
 
     switch (inlink->format) {
     case AV_SAMPLE_FMT_U8:
-        bs2b->filter = bs2b_cross_feed_u8;
+        bs2b->filter = (filter_func) bs2b_cross_feed_u8;
         break;
     case AV_SAMPLE_FMT_S16:
-        bs2b->filter = (void*)bs2b_cross_feed_s16;
+        bs2b->filter = (filter_func) bs2b_cross_feed_s16;
         break;
     case AV_SAMPLE_FMT_S32:
-        bs2b->filter = (void*)bs2b_cross_feed_s32;
+        bs2b->filter = (filter_func) bs2b_cross_feed_s32;
         break;
     case AV_SAMPLE_FMT_FLT:
-        bs2b->filter = (void*)bs2b_cross_feed_f;
+        bs2b->filter = (filter_func) bs2b_cross_feed_f;
         break;
     case AV_SAMPLE_FMT_DBL:
-        bs2b->filter = (void*)bs2b_cross_feed_d;
+        bs2b->filter = (filter_func) bs2b_cross_feed_d;
         break;
     default:
         return AVERROR_BUG;

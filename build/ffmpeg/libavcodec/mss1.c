@@ -56,6 +56,8 @@ static void arith_normalise(ArithCoder *c)
         c->low   <<= 1;
         c->high  <<= 1;
         c->high   |= 1;
+        if (get_bits_left(c->gbc.gb) < 1)
+            c->overread++;
         c->value  |= get_bits1(c->gbc.gb);
     }
 }
@@ -112,6 +114,7 @@ static void arith_init(ArithCoder *c, GetBitContext *gb)
     c->low           = 0;
     c->high          = 0xFFFF;
     c->value         = get_bits(gb, 16);
+    c->overread      = 0;
     c->gbc.gb        = gb;
     c->get_model_sym = arith_get_model_sym;
     c->get_number    = arith_get_number;
@@ -197,6 +200,8 @@ static av_cold int mss1_decode_init(AVCodecContext *avctx)
         return AVERROR(ENOMEM);
 
     ret = ff_mss12_decode_init(&c->ctx, 0, &c->sc, NULL);
+    if (ret < 0)
+        av_frame_free(&c->pic);
 
     avctx->pix_fmt = AV_PIX_FMT_PAL8;
 
@@ -222,5 +227,5 @@ AVCodec ff_mss1_decoder = {
     .init           = mss1_decode_init,
     .close          = mss1_decode_end,
     .decode         = mss1_decode_frame,
-    .capabilities   = CODEC_CAP_DR1,
+    .capabilities   = AV_CODEC_CAP_DR1,
 };

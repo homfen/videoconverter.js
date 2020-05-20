@@ -8,8 +8,8 @@
  *  be found in the AUTHORS file in the root of the source tree.
  */
 
-#ifndef TEST_MD5_HELPER_H_
-#define TEST_MD5_HELPER_H_
+#ifndef VPX_TEST_MD5_HELPER_H_
+#define VPX_TEST_MD5_HELPER_H_
 
 #include "./md5_utils.h"
 #include "vpx/vpx_decoder.h"
@@ -17,9 +17,7 @@
 namespace libvpx_test {
 class MD5 {
  public:
-  MD5() {
-    MD5Init(&md5_);
-  }
+  MD5() { MD5Init(&md5_); }
 
   void Add(const vpx_image_t *img) {
     for (int plane = 0; plane < 3; ++plane) {
@@ -28,16 +26,25 @@ class MD5 {
       // plane, we never want to round down and thus skip a pixel so if
       // we are shifting by 1 (chroma_shift) we add 1 before doing the shift.
       // This works only for chroma_shift of 0 and 1.
-      const int h = plane ? (img->d_h + img->y_chroma_shift) >>
-                    img->y_chroma_shift : img->d_h;
-      const int w = plane ? (img->d_w + img->x_chroma_shift) >>
-                    img->x_chroma_shift : img->d_w;
+      const int bytes_per_sample =
+          (img->fmt & VPX_IMG_FMT_HIGHBITDEPTH) ? 2 : 1;
+      const int h =
+          plane ? (img->d_h + img->y_chroma_shift) >> img->y_chroma_shift
+                : img->d_h;
+      const int w =
+          (plane ? (img->d_w + img->x_chroma_shift) >> img->x_chroma_shift
+                 : img->d_w) *
+          bytes_per_sample;
 
       for (int y = 0; y < h; ++y) {
         MD5Update(&md5_, buf, w);
         buf += img->stride[plane];
       }
     }
+  }
+
+  void Add(const uint8_t *data, size_t size) {
+    MD5Update(&md5_, data, static_cast<uint32_t>(size));
   }
 
   const char *Get(void) {
@@ -50,8 +57,8 @@ class MD5 {
 
     MD5Final(tmp, &ctx_tmp);
     for (int i = 0; i < 16; i++) {
-      res_[i * 2 + 0]  = hex[tmp[i] >> 4];
-      res_[i * 2 + 1]  = hex[tmp[i] & 0xf];
+      res_[i * 2 + 0] = hex[tmp[i] >> 4];
+      res_[i * 2 + 1] = hex[tmp[i] & 0xf];
     }
     res_[32] = 0;
 
@@ -65,4 +72,4 @@ class MD5 {
 
 }  // namespace libvpx_test
 
-#endif  // TEST_MD5_HELPER_H_
+#endif  // VPX_TEST_MD5_HELPER_H_

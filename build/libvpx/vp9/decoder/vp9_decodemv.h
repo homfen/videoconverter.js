@@ -8,23 +8,22 @@
  *  be found in the AUTHORS file in the root of the source tree.
  */
 
-#ifndef VP9_DECODER_VP9_DECODEMV_H_
-#define VP9_DECODER_VP9_DECODEMV_H_
+#ifndef VPX_VP9_DECODER_VP9_DECODEMV_H_
+#define VPX_VP9_DECODER_VP9_DECODEMV_H_
 
-#include "vp9/decoder/vp9_reader.h"
+#include "vpx_dsp/bitreader.h"
+
+#include "vp9/decoder/vp9_decoder.h"
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-struct TileInfo;
-
-void vp9_read_mode_info(VP9_COMMON *cm, MACROBLOCKD *xd,
-                        const struct TileInfo *const tile,
-                        int mi_row, int mi_col, vp9_reader *r);
+void vp9_read_mode_info(TileWorkerData *twd, VP9Decoder *const pbi, int mi_row,
+                        int mi_col, int x_mis, int y_mis);
 
 #ifdef __cplusplus
 }  // extern "C"
 #endif
 
-#endif  // VP9_DECODER_VP9_DECODEMV_H_
+#endif  // VPX_VP9_DECODER_VP9_DECODEMV_H_

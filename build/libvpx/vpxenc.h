@@ -7,8 +7,8 @@
  *  in the file PATENTS.  All contributing project authors may
  *  be found in the AUTHORS file in the root of the source tree.
  */
-#ifndef VPXENC_H_
-#define VPXENC_H_
+#ifndef VPX_VPXENC_H_
+#define VPX_VPXENC_H_
 
 #include "vpx/vpx_encoder.h"
 
@@ -22,6 +22,14 @@ enum TestDecodeFatality {
   TEST_DECODE_WARN,
 };
 
+typedef enum {
+  I420,  // 4:2:0 8+ bit-depth
+  I422,  // 4:2:2 8+ bit-depth
+  I444,  // 4:4:4 8+ bit-depth
+  I440,  // 4:4:0 8+ bit-depth
+  YV12,  // 4:2:0 with uv flipped, only 8-bit depth
+} ColorInputType;
+
 struct VpxInterface;
 
 /* Configuration elements common to all streams. */
@@ -31,7 +39,7 @@ struct VpxEncoderConfig {
   int pass;
   int usage;
   int deadline;
-  int use_i420;
+  ColorInputType color_type;
   int quiet;
   int verbose;
   int limit;
@@ -53,4 +61,4 @@ struct VpxEncoderConfig {
 }  // extern "C"
 #endif
 
-#endif  // VPXENC_H_
+#endif  // VPX_VPXENC_H_

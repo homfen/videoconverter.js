@@ -38,6 +38,7 @@
 #include "huffyuvencdsp.h"
 #include "put_bits.h"
 #include "lossless_videodsp.h"
+#include "lossless_videoencdsp.h"
 
 #define VLC_BITS 12
 
@@ -52,6 +53,7 @@ typedef enum Predictor {
 } Predictor;
 
 typedef struct HYuvContext {
+    AVClass *class;
     AVCodecContext *avctx;
     Predictor predictor;
     GetBitContext gb;
@@ -88,6 +90,8 @@ typedef struct HYuvContext {
     HuffYUVDSPContext hdsp;
     HuffYUVEncDSPContext hencdsp;
     LLVidDSPContext llviddsp;
+    LLVidEncDSPContext llvidencdsp;
+    int non_determ; // non-deterministic, multi-threaded encoder allowed
 } HYuvContext;
 
 void ff_huffyuv_common_init(AVCodecContext *s);

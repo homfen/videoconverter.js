@@ -27,162 +27,146 @@
 #include "libavutil/imgutils.h"
 #include "libavutil/log.h"
 #include "libavutil/opt.h"
+#include "libavcodec/bytestream.h"
+#include "libavcodec/gif.h"
 
-static int gif_image_write_header(AVFormatContext *s, int width, int height,
-                                  int loop_count, uint32_t *palette)
-{
-    AVIOContext *pb = s->pb;
-    AVRational sar = s->streams[0]->codec->sample_aspect_ratio;
-    int i;
-    int64_t aspect = 0;
-
-    if (sar.num > 0 && sar.den > 0) {
-        aspect = sar.num * 64LL / sar.den - 15;
-        if (aspect < 0 || aspect > 255)
-            aspect = 0;
-    }
-
-    avio_write(pb, "GIF", 3);
-    avio_write(pb, "89a", 3);
-    avio_wl16(pb, width);
-    avio_wl16(pb, height);
-
-    if (palette) {
-        avio_w8(pb, 0xf7); /* flags: global clut, 256 entries */
-        avio_w8(pb, 0x1f); /* background color index */
-        avio_w8(pb, aspect);
-        for (i = 0; i < 256; i++) {
-            const uint32_t v = palette[i] & 0xffffff;
-            avio_wb24(pb, v);
-        }
-    } else {
-        avio_w8(pb, 0); /* flags */
-        avio_w8(pb, 0); /* background color index */
-        avio_w8(pb, aspect);
-    }
-
-
-    if (loop_count >= 0 ) {
-        /* "NETSCAPE EXTENSION" for looped animation GIF */
-        avio_w8(pb, 0x21); /* GIF Extension code */
-        avio_w8(pb, 0xff); /* Application Extension Label */
-        avio_w8(pb, 0x0b); /* Length of Application Block */
-        avio_write(pb, "NETSCAPE2.0", sizeof("NETSCAPE2.0") - 1);
-        avio_w8(pb, 0x03); /* Length of Data Sub-Block */
-        avio_w8(pb, 0x01);
-        avio_wl16(pb, (uint16_t)loop_count);
-        avio_w8(pb, 0x00); /* Data Sub-block Terminator */
-    }
-
-    return 0;
-}
-
-typedef struct {
+typedef struct GIFContext {
     AVClass *class;
     int loop;
     int last_delay;
-    AVPacket *prev_pkt;
     int duration;
+    int64_t last_pos;
+    int have_end;
+    AVPacket *prev_pkt;
 } GIFContext;
 
 static int gif_write_header(AVFormatContext *s)
 {
-    GIFContext *gif = s->priv_data;
-    AVCodecContext *video_enc;
-    int width, height;
-    uint32_t palette[AVPALETTE_COUNT];
-
     if (s->nb_streams != 1 ||
-        s->streams[0]->codec->codec_type != AVMEDIA_TYPE_VIDEO ||
-        s->streams[0]->codec->codec_id   != AV_CODEC_ID_GIF) {
+        s->streams[0]->codecpar->codec_type != AVMEDIA_TYPE_VIDEO ||
+        s->streams[0]->codecpar->codec_id   != AV_CODEC_ID_GIF) {
         av_log(s, AV_LOG_ERROR,
                "GIF muxer supports only a single video GIF stream.\n");
         return AVERROR(EINVAL);
     }
 
-    video_enc = s->streams[0]->codec;
-    width  = video_enc->width;
-    height = video_enc->height;
-
     avpriv_set_pts_info(s->streams[0], 64, 1, 100);
-    if (avpriv_set_systematic_pal2(palette, video_enc->pix_fmt) < 0) {
-        av_assert0(video_enc->pix_fmt == AV_PIX_FMT_PAL8);
-        gif_image_write_header(s, width, height, gif->loop, NULL);
-    } else {
-        gif_image_write_header(s, width, height, gif->loop, palette);
-    }
 
-    avio_flush(s->pb);
     return 0;
 }
 
-static int flush_packet(AVFormatContext *s, AVPacket *new)
+static int gif_parse_packet(AVFormatContext *s, uint8_t *data, int size)
 {
-    GIFContext *gif = s->priv_data;
-    int size;
-    AVIOContext *pb = s->pb;
-    uint8_t flags = 0x4, transparent_color_index = 0x1f;
-    const uint32_t *palette;
-    AVPacket *pkt = gif->prev_pkt;
+    GetByteContext gb;
+    int x;
 
-    if (!pkt)
-        return 0;
+    bytestream2_init(&gb, data, size);
 
-    /* Mark one colour as transparent if the input palette contains at least
-     * one colour that is more than 50% transparent. */
-    palette = (uint32_t*)av_packet_get_side_data(pkt, AV_PKT_DATA_PALETTE, &size);
-    if (palette && size != AVPALETTE_SIZE) {
-        av_log(s, AV_LOG_ERROR, "Invalid palette extradata\n");
-        return AVERROR_INVALIDDATA;
-    }
-    if (palette) {
-        unsigned i, smallest_alpha = 0xff;
+    while (bytestream2_get_bytes_left(&gb) > 0) {
+        x = bytestream2_get_byte(&gb);
+        if (x != GIF_EXTENSION_INTRODUCER)
+            return 0;
 
-        for (i = 0; i < AVPALETTE_COUNT; i++) {
-            const uint32_t v = palette[i];
-            if (v >> 24 < smallest_alpha) {
-                smallest_alpha = v >> 24;
-                transparent_color_index = i;
-            }
+        x = bytestream2_get_byte(&gb);
+        while (x != GIF_GCE_EXT_LABEL && bytestream2_get_bytes_left(&gb) > 0) {
+            int block_size = bytestream2_get_byte(&gb);
+            if (!block_size)
+                break;
+            bytestream2_skip(&gb, block_size);
         }
-        if (smallest_alpha < 128)
-            flags |= 0x1; /* Transparent Color Flag */
+
+        if (x == GIF_GCE_EXT_LABEL)
+            return bytestream2_tell(&gb) + 2;
     }
 
+    return 0;
+}
+
+static int gif_get_delay(GIFContext *gif, AVPacket *prev, AVPacket *new)
+{
     if (new && new->pts != AV_NOPTS_VALUE)
-        gif->duration = av_clip_uint16(new->pts - gif->prev_pkt->pts);
+        gif->duration = av_clip_uint16(new->pts - prev->pts);
     else if (!new && gif->last_delay >= 0)
         gif->duration = gif->last_delay;
 
-    /* graphic control extension block */
-    avio_w8(pb, 0x21);
-    avio_w8(pb, 0xf9);
-    avio_w8(pb, 0x04); /* block size */
-    avio_w8(pb, flags);
-    avio_wl16(pb, gif->duration);
-    avio_w8(pb, transparent_color_index);
-    avio_w8(pb, 0x00);
-
-    avio_write(pb, pkt->data, pkt->size);
-
-    av_free_packet(gif->prev_pkt);
-    if (new)
-        av_copy_packet(gif->prev_pkt, new);
-
-    return 0;
+    return gif->duration;
 }
 
-static int gif_write_packet(AVFormatContext *s, AVPacket *pkt)
+static int gif_write_packet(AVFormatContext *s, AVPacket *new_pkt)
 {
     GIFContext *gif = s->priv_data;
+    AVIOContext *pb = s->pb;
+    AVPacket *pkt = gif->prev_pkt;
 
     if (!gif->prev_pkt) {
-        gif->prev_pkt = av_malloc(sizeof(*gif->prev_pkt));
+        gif->prev_pkt = av_packet_alloc();
         if (!gif->prev_pkt)
             return AVERROR(ENOMEM);
-        return av_copy_packet(gif->prev_pkt, pkt);
+        return av_packet_ref(gif->prev_pkt, new_pkt);
     }
-    return flush_packet(s, pkt);
+
+    gif->last_pos = avio_tell(pb);
+    if (pkt->size > 0)
+        gif->have_end = pkt->data[pkt->size - 1] == GIF_TRAILER;
+
+    if (!gif->last_pos) {
+        int delay_pos;
+        int off = 13;
+
+        if (pkt->size < 13)
+            return AVERROR(EINVAL);
+
+        if (pkt->data[10] & 0x80)
+            off += 3 * (1 << ((pkt->data[10] & 0x07) + 1));
+
+        if (pkt->size < off + 2)
+            return AVERROR(EINVAL);
+
+        avio_write(pb, pkt->data, off);
+
+        if (pkt->data[off] == GIF_EXTENSION_INTRODUCER && pkt->data[off + 1] == 0xff)
+            off += 19;
+
+        if (pkt->size <= off)
+            return AVERROR(EINVAL);
+
+        /* "NETSCAPE EXTENSION" for looped animation GIF */
+        if (gif->loop >= 0) {
+            avio_w8(pb, GIF_EXTENSION_INTRODUCER); /* GIF Extension code */
+            avio_w8(pb, GIF_APP_EXT_LABEL); /* Application Extension Label */
+            avio_w8(pb, 0x0b); /* Length of Application Block */
+            avio_write(pb, "NETSCAPE2.0", sizeof("NETSCAPE2.0") - 1);
+            avio_w8(pb, 0x03); /* Length of Data Sub-Block */
+            avio_w8(pb, 0x01);
+            avio_wl16(pb, (uint16_t)gif->loop);
+            avio_w8(pb, 0x00); /* Data Sub-block Terminator */
+        }
+
+        delay_pos = gif_parse_packet(s, pkt->data + off, pkt->size - off);
+        if (delay_pos > 0 && delay_pos < pkt->size - off - 2) {
+            avio_write(pb, pkt->data + off, delay_pos);
+            avio_wl16(pb, gif_get_delay(gif, pkt, new_pkt));
+            avio_write(pb, pkt->data + off + delay_pos + 2, pkt->size - off - delay_pos - 2);
+        } else {
+            avio_write(pb, pkt->data + off, pkt->size - off);
+        }
+    } else {
+        int delay_pos = gif_parse_packet(s, pkt->data, pkt->size);
+
+        if (delay_pos > 0 && delay_pos < pkt->size - 2) {
+            avio_write(pb, pkt->data, delay_pos);
+            avio_wl16(pb, gif_get_delay(gif, pkt, new_pkt));
+            avio_write(pb, pkt->data + delay_pos + 2, pkt->size - delay_pos - 2);
+        } else {
+            avio_write(pb, pkt->data, pkt->size);
+        }
+    }
+
+    av_packet_unref(gif->prev_pkt);
+    if (new_pkt)
+        return av_packet_ref(gif->prev_pkt, new_pkt);
+
+    return 0;
 }
 
 static int gif_write_trailer(AVFormatContext *s)
@@ -190,9 +174,14 @@ static int gif_write_trailer(AVFormatContext *s)
     GIFContext *gif = s->priv_data;
     AVIOContext *pb = s->pb;
 
-    flush_packet(s, NULL);
-    av_freep(&gif->prev_pkt);
-    avio_w8(pb, 0x3b);
+    if (!gif->prev_pkt)
+        return AVERROR(EINVAL);
+
+    gif_write_packet(s, NULL);
+
+    if (!gif->have_end)
+        avio_w8(pb, GIF_TRAILER);
+    av_packet_free(&gif->prev_pkt);
 
     return 0;
 }
@@ -216,7 +205,7 @@ static const AVClass gif_muxer_class = {
 
 AVOutputFormat ff_gif_muxer = {
     .name           = "gif",
-    .long_name      = NULL_IF_CONFIG_SMALL("GIF Animation"),
+    .long_name      = NULL_IF_CONFIG_SMALL("CompuServe Graphics Interchange Format (GIF)"),
     .mime_type      = "image/gif",
     .extensions     = "gif",
     .priv_data_size = sizeof(GIFContext),

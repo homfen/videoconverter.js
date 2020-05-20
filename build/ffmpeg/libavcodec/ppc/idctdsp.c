@@ -30,17 +30,16 @@
  * IDCT function itself was to factor out the partial transposition, and to
  * perform a full transpose at the end of the function. */
 
+#include "config.h"
+
 #include <stdlib.h>
 #include <string.h>
-#include "config.h"
-#if HAVE_ALTIVEC_H
-#include <altivec.h>
-#endif
 
 #include "libavutil/attributes.h"
 #include "libavutil/cpu.h"
 #include "libavutil/ppc/cpu.h"
-#include "libavutil/ppc/types_altivec.h"
+#include "libavutil/ppc/util_altivec.h"
+
 #include "libavcodec/idctdsp.h"
 
 #if HAVE_ALTIVEC
@@ -169,7 +168,7 @@ static void idct_altivec(int16_t *blk)
     block[7] = vx7;
 }
 
-static void idct_put_altivec(uint8_t *dest, int stride, int16_t *blk)
+static void idct_put_altivec(uint8_t *dest, ptrdiff_t stride, int16_t *blk)
 {
     vec_s16 *block = (vec_s16 *) blk;
     vec_u8 tmp;
@@ -198,7 +197,7 @@ static void idct_put_altivec(uint8_t *dest, int stride, int16_t *blk)
     COPY(dest, vx7);
 }
 
-static void idct_add_altivec(uint8_t *dest, int stride, int16_t *blk)
+static void idct_add_altivec(uint8_t *dest, ptrdiff_t stride, int16_t *blk)
 {
     vec_s16 *block = (vec_s16 *) blk;
     vec_u8 tmp;
@@ -209,16 +208,26 @@ static void idct_add_altivec(uint8_t *dest, int stride, int16_t *blk)
 
     IDCT;
 
+#if HAVE_BIGENDIAN
     p0    = vec_lvsl(0, dest);
     p1    = vec_lvsl(stride, dest);
     p     = vec_splat_u8(-1);
     perm0 = vec_mergeh(p, p0);
     perm1 = vec_mergeh(p, p1);
+#endif
+
+#if HAVE_BIGENDIAN
+#define GET_TMP2(dest, prm)                                 \
+    tmp  = vec_ld(0, dest);                                 \
+    tmp2 = (vec_s16) vec_perm(tmp, (vec_u8) zero, prm);
+#else
+#define GET_TMP2(dest, prm)                                 \
+    tmp  = vec_vsx_ld(0, dest);                             \
+    tmp2 = (vec_s16) vec_mergeh(tmp, (vec_u8) zero)
+#endif
 
 #define ADD(dest, src, perm)                                \
-    /* *(uint64_t *) &tmp = *(uint64_t *) dest; */          \
-    tmp  = vec_ld(0, dest);                                 \
-    tmp2 = (vec_s16) vec_perm(tmp, (vec_u8) zero, perm);    \
+    GET_TMP2(dest, perm);                                   \
     tmp3 = vec_adds(tmp2, src);                             \
     tmp  = vec_packsu(tmp3, tmp3);                          \
     vec_ste((vec_u32) tmp, 0, (unsigned int *) dest);       \
@@ -247,15 +256,16 @@ av_cold void ff_idctdsp_init_ppc(IDCTDSPContext *c, AVCodecContext *avctx,
                                  unsigned high_bit_depth)
 {
 #if HAVE_ALTIVEC
-    if (PPC_ALTIVEC(av_get_cpu_flags())) {
-        if (!high_bit_depth && avctx->lowres == 0) {
-            if ((avctx->idct_algo == FF_IDCT_AUTO) ||
-                (avctx->idct_algo == FF_IDCT_ALTIVEC)) {
-                c->idct                  = idct_altivec;
-                c->idct_add              = idct_add_altivec;
-                c->idct_put              = idct_put_altivec;
-                c->idct_permutation_type = FF_TRANSPOSE_IDCT_PERM;
-            }
+    if (!PPC_ALTIVEC(av_get_cpu_flags()))
+        return;
+
+    if (!high_bit_depth && avctx->lowres == 0) {
+        if ((avctx->idct_algo == FF_IDCT_AUTO && !(avctx->flags & AV_CODEC_FLAG_BITEXACT)) ||
+            (avctx->idct_algo == FF_IDCT_ALTIVEC)) {
+            c->idct      = idct_altivec;
+            c->idct_add  = idct_add_altivec;
+            c->idct_put  = idct_put_altivec;
+            c->perm_type = FF_IDCT_PERM_TRANSPOSE;
         }
     }
 #endif /* HAVE_ALTIVEC */
