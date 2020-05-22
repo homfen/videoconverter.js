@@ -1,0 +1,1 @@
+/Users/xingquan.hf/Code/github/public/emsdk/upstream/emscripten/emcc -DNDEBUG -O2  -O2 @CMakeFiles/vector-cmp.dir/objects1.rsp  -o vector-cmp.js @CMakeFiles/vector-cmp.dir/linklibs.rsp

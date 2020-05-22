@@ -1,0 +1,1 @@
+/Users/xingquan.hf/Code/github/public/emsdk/upstream/emscripten/emcc   -DNDEBUG -O2  -O2 @CMakeFiles/3-options-input-fn.dir/objects1.rsp  -o 3-options-input-fn.js @CMakeFiles/3-options-input-fn.dir/linklibs.rsp

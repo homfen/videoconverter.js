@@ -1,0 +1,2 @@
+set(TARGET_HEADERS "/Users/xingquan.hf/Code/github/fork/videoconverter.js/build/lib/libsoxr/src/soxr.h;/Users/xingquan.hf/Code/github/fork/videoconverter.js/build/lib/libsoxr/src/soxr-lsr.h")
+set(TARGET_PCS "/Users/xingquan.hf/Code/github/fork/videoconverter.js/build/lib/libsoxr/src/soxr.pc /Users/xingquan.hf/Code/github/fork/videoconverter.js/build/lib/libsoxr/src/soxr-lsr.pc")
