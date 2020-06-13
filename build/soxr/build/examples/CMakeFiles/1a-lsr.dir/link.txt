@@ -1,0 +1,1 @@
+/Users/xingquan.hf/Code/github/public/emsdk/upstream/emscripten/emcc   -Wconversion -Wall -Wextra       -pedantic -Wundef -Wpointer-arith -Wno-long-long -Wno-keyword-macro        -std=gnu89 -Wnested-externs -Wmissing-prototypes -Wstrict-prototypes -DNDEBUG -O2  -O2 @CMakeFiles/1a-lsr.dir/objects1.rsp  -o 1a-lsr.js @CMakeFiles/1a-lsr.dir/linklibs.rsp

@@ -1,0 +1,364 @@
+Detecting C OpenMP failed with the following output:
+Change Dir: /Users/xingquan.hf/Code/github/fork/videoconverter.js/build/soxr/build/CMakeFiles/CMakeTmp
+
+Run Build Command(s):/usr/bin/make cmTC_ff4ca/fast && /Library/Developer/CommandLineTools/usr/bin/make -f CMakeFiles/cmTC_ff4ca.dir/build.make CMakeFiles/cmTC_ff4ca.dir/build
+Building C object CMakeFiles/cmTC_ff4ca.dir/OpenMPTryFlag.c.o
+/Users/xingquan.hf/Code/github/public/emsdk/upstream/emscripten/emcc   -fopenmp=libomp -v   -o CMakeFiles/cmTC_ff4ca.dir/OpenMPTryFlag.c.o   -c /Users/xingquan.hf/Code/github/fork/videoconverter.js/build/soxr/build/CMakeFiles/FindOpenMP/OpenMPTryFlag.c
+shared:INFO: (Emscripten: Running sanity checks)
+ "/Users/xingquan.hf/Code/github/public/emsdk/upstream/bin/clang" -target wasm32-unknown-emscripten -D__EMSCRIPTEN_major__=1 -D__EMSCRIPTEN_minor__=39 -D__EMSCRIPTEN_tiny__=12 -D_LIBCPP_ABI_VERSION=2 -Dunix -D__unix -D__unix__ -Werror=implicit-function-declaration -Xclang -nostdsysteminc -Xclang -isystem/Users/xingquan.hf/Code/github/public/emsdk/upstream/emscripten/system/include/libcxx -Xclang -isystem/Users/xingquan.hf/Code/github/public/emsdk/upstream/emscripten/system/lib/libcxxabi/include -Xclang -isystem/Users/xingquan.hf/Code/github/public/emsdk/upstream/emscripten/system/lib/libunwind/include -Xclang -isystem/Users/xingquan.hf/Code/github/public/emsdk/upstream/emscripten/system/include/compat -Xclang -isystem/Users/xingquan.hf/Code/github/public/emsdk/upstream/emscripten/system/include -Xclang -isystem/Users/xingquan.hf/Code/github/public/emsdk/upstream/emscripten/system/include/libc -Xclang -isystem/Users/xingquan.hf/Code/github/public/emsdk/upstream/emscripten/system/lib/libc/musl/arch/emscripten -Xclang -isystem/Users/xingquan.hf/Code/github/public/emsdk/upstream/emscripten/system/local/include -Xclang -isystem/Users/xingquan.hf/.emscripten_cache/wasm/include -fopenmp=libomp -v -c -DEMSCRIPTEN -fignore-exceptions /Users/xingquan.hf/Code/github/fork/videoconverter.js/build/soxr/build/CMakeFiles/FindOpenMP/OpenMPTryFlag.c -Xclang -isystem/Users/xingquan.hf/Code/github/public/emsdk/upstream/emscripten/system/include/SDL -c -o CMakeFiles/cmTC_ff4ca.dir/OpenMPTryFlag.c.o -mllvm -combiner-global-alias-analysis=false -mllvm -enable-emscripten-sjlj -mllvm -disable-lsr
+clang version 11.0.0 (/b/s/w/ir/cache/git/chromium.googlesource.com-external-github.com-llvm-llvm--project eaa55590945a130131a47a4d2b89e3bbdfced79e)
+Target: wasm32-unknown-emscripten
+Thread model: posix
+InstalledDir: /Users/xingquan.hf/Code/github/public/emsdk/upstream/bin
+ (in-process)
+ "/Users/xingquan.hf/Code/github/public/emsdk/upstream/bin/clang-11" -cc1 -triple wasm32-unknown-emscripten -emit-obj -mrelax-all -disable-free -main-file-name OpenMPTryFlag.c -mrelocation-model static -mthread-model posix -mframe-pointer=none -fno-rounding-math -mconstructor-aliases -target-cpu generic -fvisibility hidden -dwarf-column-info -debugger-tuning=gdb -target-linker-version 409.12 -v -resource-dir /Users/xingquan.hf/Code/github/public/emsdk/upstream/lib/clang/11.0.0 -D __EMSCRIPTEN_major__=1 -D __EMSCRIPTEN_minor__=39 -D __EMSCRIPTEN_tiny__=12 -D _LIBCPP_ABI_VERSION=2 -D unix -D __unix -D __unix__ -D EMSCRIPTEN -internal-isystem /Users/xingquan.hf/Code/github/public/emsdk/upstream/lib/clang/11.0.0/include -internal-isystem /include/wasm32-emscripten -internal-isystem /include -Werror=implicit-function-declaration -fdebug-compilation-dir /Users/xingquan.hf/Code/github/fork/videoconverter.js/build/soxr/build/CMakeFiles/CMakeTmp -ferror-limit 19 -fopenmp -fgnuc-version=4.2.1 -fignore-exceptions -nostdsysteminc -isystem/Users/xingquan.hf/Code/github/public/emsdk/upstream/emscripten/system/include/libcxx -isystem/Users/xingquan.hf/Code/github/public/emsdk/upstream/emscripten/system/lib/libcxxabi/include -isystem/Users/xingquan.hf/Code/github/public/emsdk/upstream/emscripten/system/lib/libunwind/include -isystem/Users/xingquan.hf/Code/github/public/emsdk/upstream/emscripten/system/include/compat -isystem/Users/xingquan.hf/Code/github/public/emsdk/upstream/emscripten/system/include -isystem/Users/xingquan.hf/Code/github/public/emsdk/upstream/emscripten/system/include/libc -isystem/Users/xingquan.hf/Code/github/public/emsdk/upstream/emscripten/system/lib/libc/musl/arch/emscripten -isystem/Users/xingquan.hf/Code/github/public/emsdk/upstream/emscripten/system/local/include -isystem/Users/xingquan.hf/.emscripten_cache/wasm/include -isystem/Users/xingquan.hf/Code/github/public/emsdk/upstream/emscripten/system/include/SDL -mllvm -combiner-global-alias-analysis=false -mllvm -enable-emscripten-sjlj -mllvm -disable-lsr -o CMakeFiles/cmTC_ff4ca.dir/OpenMPTryFlag.c.o -x c /Users/xingquan.hf/Code/github/fork/videoconverter.js/build/soxr/build/CMakeFiles/FindOpenMP/OpenMPTryFlag.c
+clang -cc1 version 11.0.0 based upon LLVM 11.0.0git default target x86_64-apple-darwin19.4.0
+ignoring nonexistent directory "/include/wasm32-emscripten"
+ignoring nonexistent directory "/include"
+#include "..." search starts here:
+#include <...> search starts here:
+ /Users/xingquan.hf/Code/github/public/emsdk/upstream/emscripten/system/include/libcxx
+ /Users/xingquan.hf/Code/github/public/emsdk/upstream/emscripten/system/lib/libcxxabi/include
+ /Users/xingquan.hf/Code/github/public/emsdk/upstream/emscripten/system/lib/libunwind/include
+ /Users/xingquan.hf/Code/github/public/emsdk/upstream/emscripten/system/include/compat
+ /Users/xingquan.hf/Code/github/public/emsdk/upstream/emscripten/system/include
+ /Users/xingquan.hf/Code/github/public/emsdk/upstream/emscripten/system/include/libc
+ /Users/xingquan.hf/Code/github/public/emsdk/upstream/emscripten/system/lib/libc/musl/arch/emscripten
+ /Users/xingquan.hf/Code/github/public/emsdk/upstream/emscripten/system/local/include
+ /Users/xingquan.hf/.emscripten_cache/wasm/include
+ /Users/xingquan.hf/Code/github/public/emsdk/upstream/emscripten/system/include/SDL
+ /Users/xingquan.hf/Code/github/public/emsdk/upstream/lib/clang/11.0.0/include
+End of search list.
+/Users/xingquan.hf/Code/github/fork/videoconverter.js/build/soxr/build/CMakeFiles/FindOpenMP/OpenMPTryFlag.c:2:10: fatal error: 'omp.h' file not found
+#include <omp.h>
+         ^~~~~~~
+1 error generated.
+emcc: error: '/Users/xingquan.hf/Code/github/public/emsdk/upstream/bin/clang -target wasm32-unknown-emscripten -D__EMSCRIPTEN_major__=1 -D__EMSCRIPTEN_minor__=39 -D__EMSCRIPTEN_tiny__=12 -D_LIBCPP_ABI_VERSION=2 -Dunix -D__unix -D__unix__ -Werror=implicit-function-declaration -Xclang -nostdsysteminc -Xclang -isystem/Users/xingquan.hf/Code/github/public/emsdk/upstream/emscripten/system/include/libcxx -Xclang -isystem/Users/xingquan.hf/Code/github/public/emsdk/upstream/emscripten/system/lib/libcxxabi/include -Xclang -isystem/Users/xingquan.hf/Code/github/public/emsdk/upstream/emscripten/system/lib/libunwind/include -Xclang -isystem/Users/xingquan.hf/Code/github/public/emsdk/upstream/emscripten/system/include/compat -Xclang -isystem/Users/xingquan.hf/Code/github/public/emsdk/upstream/emscripten/system/include -Xclang -isystem/Users/xingquan.hf/Code/github/public/emsdk/upstream/emscripten/system/include/libc -Xclang -isystem/Users/xingquan.hf/Code/github/public/emsdk/upstream/emscripten/system/lib/libc/musl/arch/emscripten -Xclang -isystem/Users/xingquan.hf/Code/github/public/emsdk/upstream/emscripten/system/local/include -Xclang -isystem/Users/xingquan.hf/.emscripten_cache/wasm/include -fopenmp=libomp -v -c -DEMSCRIPTEN -fignore-exceptions /Users/xingquan.hf/Code/github/fork/videoconverter.js/build/soxr/build/CMakeFiles/FindOpenMP/OpenMPTryFlag.c -Xclang -isystem/Users/xingquan.hf/Code/github/public/emsdk/upstream/emscripten/system/include/SDL -c -o CMakeFiles/cmTC_ff4ca.dir/OpenMPTryFlag.c.o -mllvm -combiner-global-alias-analysis=false -mllvm -enable-emscripten-sjlj -mllvm -disable-lsr' failed (1)
+make[1]: *** [CMakeFiles/cmTC_ff4ca.dir/OpenMPTryFlag.c.o] Error 1
+make: *** [cmTC_ff4ca/fast] Error 2
+
+
+
+Detecting C OpenMP failed with the following output:
+Change Dir: /Users/xingquan.hf/Code/github/fork/videoconverter.js/build/soxr/build/CMakeFiles/CMakeTmp
+
+Run Build Command(s):/usr/bin/make cmTC_81b3f/fast && /Library/Developer/CommandLineTools/usr/bin/make -f CMakeFiles/cmTC_81b3f.dir/build.make CMakeFiles/cmTC_81b3f.dir/build
+Building C object CMakeFiles/cmTC_81b3f.dir/OpenMPTryFlag.c.o
+/Users/xingquan.hf/Code/github/public/emsdk/upstream/emscripten/emcc   -fopenmp=libiomp5 -v   -o CMakeFiles/cmTC_81b3f.dir/OpenMPTryFlag.c.o   -c /Users/xingquan.hf/Code/github/fork/videoconverter.js/build/soxr/build/CMakeFiles/FindOpenMP/OpenMPTryFlag.c
+shared:INFO: (Emscripten: Running sanity checks)
+ "/Users/xingquan.hf/Code/github/public/emsdk/upstream/bin/clang" -target wasm32-unknown-emscripten -D__EMSCRIPTEN_major__=1 -D__EMSCRIPTEN_minor__=39 -D__EMSCRIPTEN_tiny__=12 -D_LIBCPP_ABI_VERSION=2 -Dunix -D__unix -D__unix__ -Werror=implicit-function-declaration -Xclang -nostdsysteminc -Xclang -isystem/Users/xingquan.hf/Code/github/public/emsdk/upstream/emscripten/system/include/libcxx -Xclang -isystem/Users/xingquan.hf/Code/github/public/emsdk/upstream/emscripten/system/lib/libcxxabi/include -Xclang -isystem/Users/xingquan.hf/Code/github/public/emsdk/upstream/emscripten/system/lib/libunwind/include -Xclang -isystem/Users/xingquan.hf/Code/github/public/emsdk/upstream/emscripten/system/include/compat -Xclang -isystem/Users/xingquan.hf/Code/github/public/emsdk/upstream/emscripten/system/include -Xclang -isystem/Users/xingquan.hf/Code/github/public/emsdk/upstream/emscripten/system/include/libc -Xclang -isystem/Users/xingquan.hf/Code/github/public/emsdk/upstream/emscripten/system/lib/libc/musl/arch/emscripten -Xclang -isystem/Users/xingquan.hf/Code/github/public/emsdk/upstream/emscripten/system/local/include -Xclang -isystem/Users/xingquan.hf/.emscripten_cache/wasm/include -fopenmp=libiomp5 -v -c -DEMSCRIPTEN -fignore-exceptions /Users/xingquan.hf/Code/github/fork/videoconverter.js/build/soxr/build/CMakeFiles/FindOpenMP/OpenMPTryFlag.c -Xclang -isystem/Users/xingquan.hf/Code/github/public/emsdk/upstream/emscripten/system/include/SDL -c -o CMakeFiles/cmTC_81b3f.dir/OpenMPTryFlag.c.o -mllvm -combiner-global-alias-analysis=false -mllvm -enable-emscripten-sjlj -mllvm -disable-lsr
+clang version 11.0.0 (/b/s/w/ir/cache/git/chromium.googlesource.com-external-github.com-llvm-llvm--project eaa55590945a130131a47a4d2b89e3bbdfced79e)
+Target: wasm32-unknown-emscripten
+Thread model: posix
+InstalledDir: /Users/xingquan.hf/Code/github/public/emsdk/upstream/bin
+ (in-process)
+ "/Users/xingquan.hf/Code/github/public/emsdk/upstream/bin/clang-11" -cc1 -triple wasm32-unknown-emscripten -emit-obj -mrelax-all -disable-free -main-file-name OpenMPTryFlag.c -mrelocation-model static -mthread-model posix -mframe-pointer=none -fno-rounding-math -mconstructor-aliases -target-cpu generic -fvisibility hidden -dwarf-column-info -debugger-tuning=gdb -target-linker-version 409.12 -v -resource-dir /Users/xingquan.hf/Code/github/public/emsdk/upstream/lib/clang/11.0.0 -D __EMSCRIPTEN_major__=1 -D __EMSCRIPTEN_minor__=39 -D __EMSCRIPTEN_tiny__=12 -D _LIBCPP_ABI_VERSION=2 -D unix -D __unix -D __unix__ -D EMSCRIPTEN -internal-isystem /Users/xingquan.hf/Code/github/public/emsdk/upstream/lib/clang/11.0.0/include -internal-isystem /include/wasm32-emscripten -internal-isystem /include -Werror=implicit-function-declaration -fdebug-compilation-dir /Users/xingquan.hf/Code/github/fork/videoconverter.js/build/soxr/build/CMakeFiles/CMakeTmp -ferror-limit 19 -fopenmp -fgnuc-version=4.2.1 -fignore-exceptions -nostdsysteminc -isystem/Users/xingquan.hf/Code/github/public/emsdk/upstream/emscripten/system/include/libcxx -isystem/Users/xingquan.hf/Code/github/public/emsdk/upstream/emscripten/system/lib/libcxxabi/include -isystem/Users/xingquan.hf/Code/github/public/emsdk/upstream/emscripten/system/lib/libunwind/include -isystem/Users/xingquan.hf/Code/github/public/emsdk/upstream/emscripten/system/include/compat -isystem/Users/xingquan.hf/Code/github/public/emsdk/upstream/emscripten/system/include -isystem/Users/xingquan.hf/Code/github/public/emsdk/upstream/emscripten/system/include/libc -isystem/Users/xingquan.hf/Code/github/public/emsdk/upstream/emscripten/system/lib/libc/musl/arch/emscripten -isystem/Users/xingquan.hf/Code/github/public/emsdk/upstream/emscripten/system/local/include -isystem/Users/xingquan.hf/.emscripten_cache/wasm/include -isystem/Users/xingquan.hf/Code/github/public/emsdk/upstream/emscripten/system/include/SDL -mllvm -combiner-global-alias-analysis=false -mllvm -enable-emscripten-sjlj -mllvm -disable-lsr -o CMakeFiles/cmTC_81b3f.dir/OpenMPTryFlag.c.o -x c /Users/xingquan.hf/Code/github/fork/videoconverter.js/build/soxr/build/CMakeFiles/FindOpenMP/OpenMPTryFlag.c
+clang -cc1 version 11.0.0 based upon LLVM 11.0.0git default target x86_64-apple-darwin19.4.0
+ignoring nonexistent directory "/include/wasm32-emscripten"
+ignoring nonexistent directory "/include"
+#include "..." search starts here:
+#include <...> search starts here:
+ /Users/xingquan.hf/Code/github/public/emsdk/upstream/emscripten/system/include/libcxx
+ /Users/xingquan.hf/Code/github/public/emsdk/upstream/emscripten/system/lib/libcxxabi/include
+ /Users/xingquan.hf/Code/github/public/emsdk/upstream/emscripten/system/lib/libunwind/include
+ /Users/xingquan.hf/Code/github/public/emsdk/upstream/emscripten/system/include/compat
+ /Users/xingquan.hf/Code/github/public/emsdk/upstream/emscripten/system/include
+ /Users/xingquan.hf/Code/github/public/emsdk/upstream/emscripten/system/include/libc
+ /Users/xingquan.hf/Code/github/public/emsdk/upstream/emscripten/system/lib/libc/musl/arch/emscripten
+ /Users/xingquan.hf/Code/github/public/emsdk/upstream/emscripten/system/local/include
+ /Users/xingquan.hf/.emscripten_cache/wasm/include
+ /Users/xingquan.hf/Code/github/public/emsdk/upstream/emscripten/system/include/SDL
+ /Users/xingquan.hf/Code/github/public/emsdk/upstream/lib/clang/11.0.0/include
+End of search list.
+/Users/xingquan.hf/Code/github/fork/videoconverter.js/build/soxr/build/CMakeFiles/FindOpenMP/OpenMPTryFlag.c:2:10: fatal error: 'omp.h' file not found
+#include <omp.h>
+         ^~~~~~~
+1 error generated.
+emcc: error: '/Users/xingquan.hf/Code/github/public/emsdk/upstream/bin/clang -target wasm32-unknown-emscripten -D__EMSCRIPTEN_major__=1 -D__EMSCRIPTEN_minor__=39 -D__EMSCRIPTEN_tiny__=12 -D_LIBCPP_ABI_VERSION=2 -Dunix -D__unix -D__unix__ -Werror=implicit-function-declaration -Xclang -nostdsysteminc -Xclang -isystem/Users/xingquan.hf/Code/github/public/emsdk/upstream/emscripten/system/include/libcxx -Xclang -isystem/Users/xingquan.hf/Code/github/public/emsdk/upstream/emscripten/system/lib/libcxxabi/include -Xclang -isystem/Users/xingquan.hf/Code/github/public/emsdk/upstream/emscripten/system/lib/libunwind/include -Xclang -isystem/Users/xingquan.hf/Code/github/public/emsdk/upstream/emscripten/system/include/compat -Xclang -isystem/Users/xingquan.hf/Code/github/public/emsdk/upstream/emscripten/system/include -Xclang -isystem/Users/xingquan.hf/Code/github/public/emsdk/upstream/emscripten/system/include/libc -Xclang -isystem/Users/xingquan.hf/Code/github/public/emsdk/upstream/emscripten/system/lib/libc/musl/arch/emscripten -Xclang -isystem/Users/xingquan.hf/Code/github/public/emsdk/upstream/emscripten/system/local/include -Xclang -isystem/Users/xingquan.hf/.emscripten_cache/wasm/include -fopenmp=libiomp5 -v -c -DEMSCRIPTEN -fignore-exceptions /Users/xingquan.hf/Code/github/fork/videoconverter.js/build/soxr/build/CMakeFiles/FindOpenMP/OpenMPTryFlag.c -Xclang -isystem/Users/xingquan.hf/Code/github/public/emsdk/upstream/emscripten/system/include/SDL -c -o CMakeFiles/cmTC_81b3f.dir/OpenMPTryFlag.c.o -mllvm -combiner-global-alias-analysis=false -mllvm -enable-emscripten-sjlj -mllvm -disable-lsr' failed (1)
+make[1]: *** [CMakeFiles/cmTC_81b3f.dir/OpenMPTryFlag.c.o] Error 1
+make: *** [cmTC_81b3f/fast] Error 2
+
+
+
+Detecting C OpenMP failed with the following output:
+Change Dir: /Users/xingquan.hf/Code/github/fork/videoconverter.js/build/soxr/build/CMakeFiles/CMakeTmp
+
+Run Build Command(s):/usr/bin/make cmTC_9b909/fast && /Library/Developer/CommandLineTools/usr/bin/make -f CMakeFiles/cmTC_9b909.dir/build.make CMakeFiles/cmTC_9b909.dir/build
+Building C object CMakeFiles/cmTC_9b909.dir/OpenMPTryFlag.c.o
+/Users/xingquan.hf/Code/github/public/emsdk/upstream/emscripten/emcc   -fopenmp -v   -o CMakeFiles/cmTC_9b909.dir/OpenMPTryFlag.c.o   -c /Users/xingquan.hf/Code/github/fork/videoconverter.js/build/soxr/build/CMakeFiles/FindOpenMP/OpenMPTryFlag.c
+shared:INFO: (Emscripten: Running sanity checks)
+ "/Users/xingquan.hf/Code/github/public/emsdk/upstream/bin/clang" -target wasm32-unknown-emscripten -D__EMSCRIPTEN_major__=1 -D__EMSCRIPTEN_minor__=39 -D__EMSCRIPTEN_tiny__=12 -D_LIBCPP_ABI_VERSION=2 -Dunix -D__unix -D__unix__ -Werror=implicit-function-declaration -Xclang -nostdsysteminc -Xclang -isystem/Users/xingquan.hf/Code/github/public/emsdk/upstream/emscripten/system/include/libcxx -Xclang -isystem/Users/xingquan.hf/Code/github/public/emsdk/upstream/emscripten/system/lib/libcxxabi/include -Xclang -isystem/Users/xingquan.hf/Code/github/public/emsdk/upstream/emscripten/system/lib/libunwind/include -Xclang -isystem/Users/xingquan.hf/Code/github/public/emsdk/upstream/emscripten/system/include/compat -Xclang -isystem/Users/xingquan.hf/Code/github/public/emsdk/upstream/emscripten/system/include -Xclang -isystem/Users/xingquan.hf/Code/github/public/emsdk/upstream/emscripten/system/include/libc -Xclang -isystem/Users/xingquan.hf/Code/github/public/emsdk/upstream/emscripten/system/lib/libc/musl/arch/emscripten -Xclang -isystem/Users/xingquan.hf/Code/github/public/emsdk/upstream/emscripten/system/local/include -Xclang -isystem/Users/xingquan.hf/.emscripten_cache/wasm/include -fopenmp -v -c -DEMSCRIPTEN -fignore-exceptions /Users/xingquan.hf/Code/github/fork/videoconverter.js/build/soxr/build/CMakeFiles/FindOpenMP/OpenMPTryFlag.c -Xclang -isystem/Users/xingquan.hf/Code/github/public/emsdk/upstream/emscripten/system/include/SDL -c -o CMakeFiles/cmTC_9b909.dir/OpenMPTryFlag.c.o -mllvm -combiner-global-alias-analysis=false -mllvm -enable-emscripten-sjlj -mllvm -disable-lsr
+clang version 11.0.0 (/b/s/w/ir/cache/git/chromium.googlesource.com-external-github.com-llvm-llvm--project eaa55590945a130131a47a4d2b89e3bbdfced79e)
+Target: wasm32-unknown-emscripten
+Thread model: posix
+InstalledDir: /Users/xingquan.hf/Code/github/public/emsdk/upstream/bin
+ (in-process)
+ "/Users/xingquan.hf/Code/github/public/emsdk/upstream/bin/clang-11" -cc1 -triple wasm32-unknown-emscripten -emit-obj -mrelax-all -disable-free -main-file-name OpenMPTryFlag.c -mrelocation-model static -mthread-model posix -mframe-pointer=none -fno-rounding-math -mconstructor-aliases -target-cpu generic -fvisibility hidden -dwarf-column-info -debugger-tuning=gdb -target-linker-version 409.12 -v -resource-dir /Users/xingquan.hf/Code/github/public/emsdk/upstream/lib/clang/11.0.0 -D __EMSCRIPTEN_major__=1 -D __EMSCRIPTEN_minor__=39 -D __EMSCRIPTEN_tiny__=12 -D _LIBCPP_ABI_VERSION=2 -D unix -D __unix -D __unix__ -D EMSCRIPTEN -internal-isystem /Users/xingquan.hf/Code/github/public/emsdk/upstream/lib/clang/11.0.0/include -internal-isystem /include/wasm32-emscripten -internal-isystem /include -Werror=implicit-function-declaration -fdebug-compilation-dir /Users/xingquan.hf/Code/github/fork/videoconverter.js/build/soxr/build/CMakeFiles/CMakeTmp -ferror-limit 19 -fopenmp -fgnuc-version=4.2.1 -fignore-exceptions -nostdsysteminc -isystem/Users/xingquan.hf/Code/github/public/emsdk/upstream/emscripten/system/include/libcxx -isystem/Users/xingquan.hf/Code/github/public/emsdk/upstream/emscripten/system/lib/libcxxabi/include -isystem/Users/xingquan.hf/Code/github/public/emsdk/upstream/emscripten/system/lib/libunwind/include -isystem/Users/xingquan.hf/Code/github/public/emsdk/upstream/emscripten/system/include/compat -isystem/Users/xingquan.hf/Code/github/public/emsdk/upstream/emscripten/system/include -isystem/Users/xingquan.hf/Code/github/public/emsdk/upstream/emscripten/system/include/libc -isystem/Users/xingquan.hf/Code/github/public/emsdk/upstream/emscripten/system/lib/libc/musl/arch/emscripten -isystem/Users/xingquan.hf/Code/github/public/emsdk/upstream/emscripten/system/local/include -isystem/Users/xingquan.hf/.emscripten_cache/wasm/include -isystem/Users/xingquan.hf/Code/github/public/emsdk/upstream/emscripten/system/include/SDL -mllvm -combiner-global-alias-analysis=false -mllvm -enable-emscripten-sjlj -mllvm -disable-lsr -o CMakeFiles/cmTC_9b909.dir/OpenMPTryFlag.c.o -x c /Users/xingquan.hf/Code/github/fork/videoconverter.js/build/soxr/build/CMakeFiles/FindOpenMP/OpenMPTryFlag.c
+clang -cc1 version 11.0.0 based upon LLVM 11.0.0git default target x86_64-apple-darwin19.4.0
+ignoring nonexistent directory "/include/wasm32-emscripten"
+ignoring nonexistent directory "/include"
+#include "..." search starts here:
+#include <...> search starts here:
+ /Users/xingquan.hf/Code/github/public/emsdk/upstream/emscripten/system/include/libcxx
+ /Users/xingquan.hf/Code/github/public/emsdk/upstream/emscripten/system/lib/libcxxabi/include
+ /Users/xingquan.hf/Code/github/public/emsdk/upstream/emscripten/system/lib/libunwind/include
+ /Users/xingquan.hf/Code/github/public/emsdk/upstream/emscripten/system/include/compat
+ /Users/xingquan.hf/Code/github/public/emsdk/upstream/emscripten/system/include
+ /Users/xingquan.hf/Code/github/public/emsdk/upstream/emscripten/system/include/libc
+ /Users/xingquan.hf/Code/github/public/emsdk/upstream/emscripten/system/lib/libc/musl/arch/emscripten
+ /Users/xingquan.hf/Code/github/public/emsdk/upstream/emscripten/system/local/include
+ /Users/xingquan.hf/.emscripten_cache/wasm/include
+ /Users/xingquan.hf/Code/github/public/emsdk/upstream/emscripten/system/include/SDL
+ /Users/xingquan.hf/Code/github/public/emsdk/upstream/lib/clang/11.0.0/include
+End of search list.
+/Users/xingquan.hf/Code/github/fork/videoconverter.js/build/soxr/build/CMakeFiles/FindOpenMP/OpenMPTryFlag.c:2:10: fatal error: 'omp.h' file not found
+#include <omp.h>
+         ^~~~~~~
+1 error generated.
+emcc: error: '/Users/xingquan.hf/Code/github/public/emsdk/upstream/bin/clang -target wasm32-unknown-emscripten -D__EMSCRIPTEN_major__=1 -D__EMSCRIPTEN_minor__=39 -D__EMSCRIPTEN_tiny__=12 -D_LIBCPP_ABI_VERSION=2 -Dunix -D__unix -D__unix__ -Werror=implicit-function-declaration -Xclang -nostdsysteminc -Xclang -isystem/Users/xingquan.hf/Code/github/public/emsdk/upstream/emscripten/system/include/libcxx -Xclang -isystem/Users/xingquan.hf/Code/github/public/emsdk/upstream/emscripten/system/lib/libcxxabi/include -Xclang -isystem/Users/xingquan.hf/Code/github/public/emsdk/upstream/emscripten/system/lib/libunwind/include -Xclang -isystem/Users/xingquan.hf/Code/github/public/emsdk/upstream/emscripten/system/include/compat -Xclang -isystem/Users/xingquan.hf/Code/github/public/emsdk/upstream/emscripten/system/include -Xclang -isystem/Users/xingquan.hf/Code/github/public/emsdk/upstream/emscripten/system/include/libc -Xclang -isystem/Users/xingquan.hf/Code/github/public/emsdk/upstream/emscripten/system/lib/libc/musl/arch/emscripten -Xclang -isystem/Users/xingquan.hf/Code/github/public/emsdk/upstream/emscripten/system/local/include -Xclang -isystem/Users/xingquan.hf/.emscripten_cache/wasm/include -fopenmp -v -c -DEMSCRIPTEN -fignore-exceptions /Users/xingquan.hf/Code/github/fork/videoconverter.js/build/soxr/build/CMakeFiles/FindOpenMP/OpenMPTryFlag.c -Xclang -isystem/Users/xingquan.hf/Code/github/public/emsdk/upstream/emscripten/system/include/SDL -c -o CMakeFiles/cmTC_9b909.dir/OpenMPTryFlag.c.o -mllvm -combiner-global-alias-analysis=false -mllvm -enable-emscripten-sjlj -mllvm -disable-lsr' failed (1)
+make[1]: *** [CMakeFiles/cmTC_9b909.dir/OpenMPTryFlag.c.o] Error 1
+make: *** [cmTC_9b909/fast] Error 2
+
+
+
+Performing C SOURCE FILE Test DETECT_SIMD32_C_FLAGS failed with the following output:
+Change Dir: /Users/xingquan.hf/Code/github/fork/videoconverter.js/build/soxr/build/CMakeFiles/CMakeTmp
+
+Run Build Command(s):/usr/bin/make cmTC_61140/fast && /Library/Developer/CommandLineTools/usr/bin/make -f CMakeFiles/cmTC_61140.dir/build.make CMakeFiles/cmTC_61140.dir/build
+Building C object CMakeFiles/cmTC_61140.dir/src.c.o
+/Users/xingquan.hf/Code/github/public/emsdk/upstream/emscripten/emcc   -DDETECT_SIMD32_C_FLAGS   -o CMakeFiles/cmTC_61140.dir/src.c.o   -c /Users/xingquan.hf/Code/github/fork/videoconverter.js/build/soxr/build/CMakeFiles/CMakeTmp/src.c
+In file included from /Users/xingquan.hf/Code/github/fork/videoconverter.js/build/soxr/build/CMakeFiles/CMakeTmp/src.c:2:
+In file included from /Users/xingquan.hf/Code/github/public/emsdk/upstream/lib/clang/11.0.0/include/xmmintrin.h:13:
+/Users/xingquan.hf/Code/github/public/emsdk/upstream/lib/clang/11.0.0/include/mmintrin.h:50:12: error: invalid conversion between vector type '__m64' (vector of 1 'long long' value) and integer type 'int' of different size
+    return (__m64)__builtin_ia32_vec_init_v2si(__i, 0);
+           ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/Users/xingquan.hf/Code/github/public/emsdk/upstream/lib/clang/11.0.0/include/mmintrin.h:129:12: error: invalid conversion between vector type '__m64' (vector of 1 'long long' value) and integer type 'int' of different size
+    return (__m64)__builtin_ia32_packsswb((__v4hi)__m1, (__v4hi)__m2);
+           ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/Users/xingquan.hf/Code/github/public/emsdk/upstream/lib/clang/11.0.0/include/mmintrin.h:159:12: error: invalid conversion between vector type '__m64' (vector of 1 'long long' value) and integer type 'int' of different size
+    return (__m64)__builtin_ia32_packssdw((__v2si)__m1, (__v2si)__m2);
+           ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/Users/xingquan.hf/Code/github/public/emsdk/upstream/lib/clang/11.0.0/include/mmintrin.h:189:12: error: invalid conversion between vector type '__m64' (vector of 1 'long long' value) and integer type 'int' of different size
+    return (__m64)__builtin_ia32_packuswb((__v4hi)__m1, (__v4hi)__m2);
+           ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/Users/xingquan.hf/Code/github/public/emsdk/upstream/lib/clang/11.0.0/include/mmintrin.h:216:12: error: invalid conversion between vector type '__m64' (vector of 1 'long long' value) and integer type 'int' of different size
+    return (__m64)__builtin_ia32_punpckhbw((__v8qi)__m1, (__v8qi)__m2);
+           ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/Users/xingquan.hf/Code/github/public/emsdk/upstream/lib/clang/11.0.0/include/mmintrin.h:239:12: error: invalid conversion between vector type '__m64' (vector of 1 'long long' value) and integer type 'int' of different size
+    return (__m64)__builtin_ia32_punpckhwd((__v4hi)__m1, (__v4hi)__m2);
+           ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/Users/xingquan.hf/Code/github/public/emsdk/upstream/lib/clang/11.0.0/include/mmintrin.h:260:12: error: invalid conversion between vector type '__m64' (vector of 1 'long long' value) and integer type 'int' of different size
+    return (__m64)__builtin_ia32_punpckhdq((__v2si)__m1, (__v2si)__m2);
+           ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/Users/xingquan.hf/Code/github/public/emsdk/upstream/lib/clang/11.0.0/include/mmintrin.h:287:12: error: invalid conversion between vector type '__m64' (vector of 1 'long long' value) and integer type 'int' of different size
+    return (__m64)__builtin_ia32_punpcklbw((__v8qi)__m1, (__v8qi)__m2);
+           ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/Users/xingquan.hf/Code/github/public/emsdk/upstream/lib/clang/11.0.0/include/mmintrin.h:310:12: error: invalid conversion between vector type '__m64' (vector of 1 'long long' value) and integer type 'int' of different size
+    return (__m64)__builtin_ia32_punpcklwd((__v4hi)__m1, (__v4hi)__m2);
+           ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/Users/xingquan.hf/Code/github/public/emsdk/upstream/lib/clang/11.0.0/include/mmintrin.h:331:12: error: invalid conversion between vector type '__m64' (vector of 1 'long long' value) and integer type 'int' of different size
+    return (__m64)__builtin_ia32_punpckldq((__v2si)__m1, (__v2si)__m2);
+           ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/Users/xingquan.hf/Code/github/public/emsdk/upstream/lib/clang/11.0.0/include/mmintrin.h:352:12: error: invalid conversion between vector type '__m64' (vector of 1 'long long' value) and integer type 'int' of different size
+    return (__m64)__builtin_ia32_paddb((__v8qi)__m1, (__v8qi)__m2);
+           ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/Users/xingquan.hf/Code/github/public/emsdk/upstream/lib/clang/11.0.0/include/mmintrin.h:373:12: error: invalid conversion between vector type '__m64' (vector of 1 'long long' value) and integer type 'int' of different size
+    return (__m64)__builtin_ia32_paddw((__v4hi)__m1, (__v4hi)__m2);
+           ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/Users/xingquan.hf/Code/github/public/emsdk/upstream/lib/clang/11.0.0/include/mmintrin.h:394:12: error: invalid conversion between vector type '__m64' (vector of 1 'long long' value) and integer type 'int' of different size
+    return (__m64)__builtin_ia32_paddd((__v2si)__m1, (__v2si)__m2);
+           ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/Users/xingquan.hf/Code/github/public/emsdk/upstream/lib/clang/11.0.0/include/mmintrin.h:416:12: error: invalid conversion between vector type '__m64' (vector of 1 'long long' value) and integer type 'int' of different size
+    return (__m64)__builtin_ia32_paddsb((__v8qi)__m1, (__v8qi)__m2);
+           ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/Users/xingquan.hf/Code/github/public/emsdk/upstream/lib/clang/11.0.0/include/mmintrin.h:439:12: error: invalid conversion between vector type '__m64' (vector of 1 'long long' value) and integer type 'int' of different size
+    return (__m64)__builtin_ia32_paddsw((__v4hi)__m1, (__v4hi)__m2);
+           ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/Users/xingquan.hf/Code/github/public/emsdk/upstream/lib/clang/11.0.0/include/mmintrin.h:461:12: error: invalid conversion between vector type '__m64' (vector of 1 'long long' value) and integer type 'int' of different size
+    return (__m64)__builtin_ia32_paddusb((__v8qi)__m1, (__v8qi)__m2);
+           ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/Users/xingquan.hf/Code/github/public/emsdk/upstream/lib/clang/11.0.0/include/mmintrin.h:483:12: error: invalid conversion between vector type '__m64' (vector of 1 'long long' value) and integer type 'int' of different size
+    return (__m64)__builtin_ia32_paddusw((__v4hi)__m1, (__v4hi)__m2);
+           ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/Users/xingquan.hf/Code/github/public/emsdk/upstream/lib/clang/11.0.0/include/mmintrin.h:504:12: error: invalid conversion between vector type '__m64' (vector of 1 'long long' value) and integer type 'int' of different size
+    return (__m64)__builtin_ia32_psubb((__v8qi)__m1, (__v8qi)__m2);
+           ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/Users/xingquan.hf/Code/github/public/emsdk/upstream/lib/clang/11.0.0/include/mmintrin.h:525:12: error: invalid conversion between vector type '__m64' (vector of 1 'long long' value) and integer type 'int' of different size
+    return (__m64)__builtin_ia32_psubw((__v4hi)__m1, (__v4hi)__m2);
+           ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+fatal error: too many errors emitted, stopping now [-ferror-limit=]
+20 errors generated.
+emcc: error: '/Users/xingquan.hf/Code/github/public/emsdk/upstream/bin/clang -target wasm32-unknown-emscripten -D__EMSCRIPTEN_major__=1 -D__EMSCRIPTEN_minor__=39 -D__EMSCRIPTEN_tiny__=12 -D_LIBCPP_ABI_VERSION=2 -Dunix -D__unix -D__unix__ -Werror=implicit-function-declaration -Xclang -nostdsysteminc -Xclang -isystem/Users/xingquan.hf/Code/github/public/emsdk/upstream/emscripten/system/include/libcxx -Xclang -isystem/Users/xingquan.hf/Code/github/public/emsdk/upstream/emscripten/system/lib/libcxxabi/include -Xclang -isystem/Users/xingquan.hf/Code/github/public/emsdk/upstream/emscripten/system/lib/libunwind/include -Xclang -isystem/Users/xingquan.hf/Code/github/public/emsdk/upstream/emscripten/system/include/compat -Xclang -isystem/Users/xingquan.hf/Code/github/public/emsdk/upstream/emscripten/system/include -Xclang -isystem/Users/xingquan.hf/Code/github/public/emsdk/upstream/emscripten/system/include/libc -Xclang -isystem/Users/xingquan.hf/Code/github/public/emsdk/upstream/emscripten/system/lib/libc/musl/arch/emscripten -Xclang -isystem/Users/xingquan.hf/Code/github/public/emsdk/upstream/emscripten/system/local/include -Xclang -isystem/Users/xingquan.hf/.emscripten_cache/wasm/include -DDETECT_SIMD32_C_FLAGS -c -DEMSCRIPTEN -fignore-exceptions /Users/xingquan.hf/Code/github/fork/videoconverter.js/build/soxr/build/CMakeFiles/CMakeTmp/src.c -Xclang -isystem/Users/xingquan.hf/Code/github/public/emsdk/upstream/emscripten/system/include/SDL -c -o CMakeFiles/cmTC_61140.dir/src.c.o -mllvm -combiner-global-alias-analysis=false -mllvm -enable-emscripten-sjlj -mllvm -disable-lsr' failed (1)
+make[1]: *** [CMakeFiles/cmTC_61140.dir/src.c.o] Error 1
+make: *** [cmTC_61140/fast] Error 2
+
+
+Source file was:
+
+    #include <xmmintrin.h>
+    int main(int c, char * * v) {
+      __m128 a = _mm_set_ss((float)c), b = _mm_set_ss((float)!!v);
+      return _mm_comineq_ss(a,b);
+    }
+  
+Performing C SOURCE FILE Test DETECT_SIMD32_C_FLAGS failed with the following output:
+Change Dir: /Users/xingquan.hf/Code/github/fork/videoconverter.js/build/soxr/build/CMakeFiles/CMakeTmp
+
+Run Build Command(s):/usr/bin/make cmTC_8de08/fast && /Library/Developer/CommandLineTools/usr/bin/make -f CMakeFiles/cmTC_8de08.dir/build.make CMakeFiles/cmTC_8de08.dir/build
+Building C object CMakeFiles/cmTC_8de08.dir/src.c.o
+/Users/xingquan.hf/Code/github/public/emsdk/upstream/emscripten/emcc   -DDETECT_SIMD32_C_FLAGS /arch:SSE /fp:fast -D__SSE__   -o CMakeFiles/cmTC_8de08.dir/src.c.o   -c /Users/xingquan.hf/Code/github/fork/videoconverter.js/build/soxr/build/CMakeFiles/CMakeTmp/src.c
+emcc: error: /arch:SSE: No such file or directory ("/arch:SSE" was expected to be an input file, based on the commandline arguments provided)
+make[1]: *** [CMakeFiles/cmTC_8de08.dir/src.c.o] Error 1
+make: *** [cmTC_8de08/fast] Error 2
+
+
+Source file was:
+
+    #include <xmmintrin.h>
+    int main(int c, char * * v) {
+      __m128 a = _mm_set_ss((float)c), b = _mm_set_ss((float)!!v);
+      return _mm_comineq_ss(a,b);
+    }
+  
+Performing C SOURCE FILE Test DETECT_SIMD32_C_FLAGS failed with the following output:
+Change Dir: /Users/xingquan.hf/Code/github/fork/videoconverter.js/build/soxr/build/CMakeFiles/CMakeTmp
+
+Run Build Command(s):/usr/bin/make cmTC_10e54/fast && /Library/Developer/CommandLineTools/usr/bin/make -f CMakeFiles/cmTC_10e54.dir/build.make CMakeFiles/cmTC_10e54.dir/build
+Building C object CMakeFiles/cmTC_10e54.dir/src.c.o
+/Users/xingquan.hf/Code/github/public/emsdk/upstream/emscripten/emcc   -DDETECT_SIMD32_C_FLAGS -msse -mfpmath=sse   -o CMakeFiles/cmTC_10e54.dir/src.c.o   -c /Users/xingquan.hf/Code/github/fork/videoconverter.js/build/soxr/build/CMakeFiles/CMakeTmp/src.c
+clang-11: warning: argument unused during compilation: '-msse' [-Wunused-command-line-argument]
+error: unknown FP unit 'sse'
+emcc: error: '/Users/xingquan.hf/Code/github/public/emsdk/upstream/bin/clang -target wasm32-unknown-emscripten -D__EMSCRIPTEN_major__=1 -D__EMSCRIPTEN_minor__=39 -D__EMSCRIPTEN_tiny__=12 -D_LIBCPP_ABI_VERSION=2 -Dunix -D__unix -D__unix__ -Werror=implicit-function-declaration -Xclang -nostdsysteminc -Xclang -isystem/Users/xingquan.hf/Code/github/public/emsdk/upstream/emscripten/system/include/libcxx -Xclang -isystem/Users/xingquan.hf/Code/github/public/emsdk/upstream/emscripten/system/lib/libcxxabi/include -Xclang -isystem/Users/xingquan.hf/Code/github/public/emsdk/upstream/emscripten/system/lib/libunwind/include -Xclang -isystem/Users/xingquan.hf/Code/github/public/emsdk/upstream/emscripten/system/include/compat -Xclang -isystem/Users/xingquan.hf/Code/github/public/emsdk/upstream/emscripten/system/include -Xclang -isystem/Users/xingquan.hf/Code/github/public/emsdk/upstream/emscripten/system/include/libc -Xclang -isystem/Users/xingquan.hf/Code/github/public/emsdk/upstream/emscripten/system/lib/libc/musl/arch/emscripten -Xclang -isystem/Users/xingquan.hf/Code/github/public/emsdk/upstream/emscripten/system/local/include -Xclang -isystem/Users/xingquan.hf/.emscripten_cache/wasm/include -DDETECT_SIMD32_C_FLAGS -msse -mfpmath=sse -c -DEMSCRIPTEN -fignore-exceptions /Users/xingquan.hf/Code/github/fork/videoconverter.js/build/soxr/build/CMakeFiles/CMakeTmp/src.c -Xclang -isystem/Users/xingquan.hf/Code/github/public/emsdk/upstream/emscripten/system/include/SDL -c -o CMakeFiles/cmTC_10e54.dir/src.c.o -mllvm -combiner-global-alias-analysis=false -mllvm -enable-emscripten-sjlj -mllvm -disable-lsr' failed (1)
+make[1]: *** [CMakeFiles/cmTC_10e54.dir/src.c.o] Error 1
+make: *** [cmTC_10e54/fast] Error 2
+
+
+Source file was:
+
+    #include <xmmintrin.h>
+    int main(int c, char * * v) {
+      __m128 a = _mm_set_ss((float)c), b = _mm_set_ss((float)!!v);
+      return _mm_comineq_ss(a,b);
+    }
+  
+Performing C SOURCE FILE Test DETECT_SIMD32_C_FLAGS failed with the following output:
+Change Dir: /Users/xingquan.hf/Code/github/fork/videoconverter.js/build/soxr/build/CMakeFiles/CMakeTmp
+
+Run Build Command(s):/usr/bin/make cmTC_4801f/fast && /Library/Developer/CommandLineTools/usr/bin/make -f CMakeFiles/cmTC_4801f.dir/build.make CMakeFiles/cmTC_4801f.dir/build
+Building C object CMakeFiles/cmTC_4801f.dir/src.c.o
+/Users/xingquan.hf/Code/github/public/emsdk/upstream/emscripten/emcc   -DDETECT_SIMD32_C_FLAGS -msse -mfpmath=sse   -o CMakeFiles/cmTC_4801f.dir/src.c.o   -c /Users/xingquan.hf/Code/github/fork/videoconverter.js/build/soxr/build/CMakeFiles/CMakeTmp/src.c
+clang-11: warning: argument unused during compilation: '-msse' [-Wunused-command-line-argument]
+error: unknown FP unit 'sse'
+emcc: error: '/Users/xingquan.hf/Code/github/public/emsdk/upstream/bin/clang -target wasm32-unknown-emscripten -D__EMSCRIPTEN_major__=1 -D__EMSCRIPTEN_minor__=39 -D__EMSCRIPTEN_tiny__=12 -D_LIBCPP_ABI_VERSION=2 -Dunix -D__unix -D__unix__ -Werror=implicit-function-declaration -Xclang -nostdsysteminc -Xclang -isystem/Users/xingquan.hf/Code/github/public/emsdk/upstream/emscripten/system/include/libcxx -Xclang -isystem/Users/xingquan.hf/Code/github/public/emsdk/upstream/emscripten/system/lib/libcxxabi/include -Xclang -isystem/Users/xingquan.hf/Code/github/public/emsdk/upstream/emscripten/system/lib/libunwind/include -Xclang -isystem/Users/xingquan.hf/Code/github/public/emsdk/upstream/emscripten/system/include/compat -Xclang -isystem/Users/xingquan.hf/Code/github/public/emsdk/upstream/emscripten/system/include -Xclang -isystem/Users/xingquan.hf/Code/github/public/emsdk/upstream/emscripten/system/include/libc -Xclang -isystem/Users/xingquan.hf/Code/github/public/emsdk/upstream/emscripten/system/lib/libc/musl/arch/emscripten -Xclang -isystem/Users/xingquan.hf/Code/github/public/emsdk/upstream/emscripten/system/local/include -Xclang -isystem/Users/xingquan.hf/.emscripten_cache/wasm/include -DDETECT_SIMD32_C_FLAGS -msse -mfpmath=sse -c -DEMSCRIPTEN -fignore-exceptions /Users/xingquan.hf/Code/github/fork/videoconverter.js/build/soxr/build/CMakeFiles/CMakeTmp/src.c -Xclang -isystem/Users/xingquan.hf/Code/github/public/emsdk/upstream/emscripten/system/include/SDL -c -o CMakeFiles/cmTC_4801f.dir/src.c.o -mllvm -combiner-global-alias-analysis=false -mllvm -enable-emscripten-sjlj -mllvm -disable-lsr' failed (1)
+make[1]: *** [CMakeFiles/cmTC_4801f.dir/src.c.o] Error 1
+make: *** [cmTC_4801f/fast] Error 2
+
+
+Source file was:
+
+    #include <xmmintrin.h>
+    int main(int c, char * * v) {
+      __m128 a = _mm_set_ss((float)c), b = _mm_set_ss((float)!!v);
+      return _mm_comineq_ss(a,b);
+    }
+  
+Performing C SOURCE FILE Test DETECT_SIMD64_C_FLAGS failed with the following output:
+Change Dir: /Users/xingquan.hf/Code/github/fork/videoconverter.js/build/soxr/build/CMakeFiles/CMakeTmp
+
+Run Build Command(s):/usr/bin/make cmTC_79d1a/fast && /Library/Developer/CommandLineTools/usr/bin/make -f CMakeFiles/cmTC_79d1a.dir/build.make CMakeFiles/cmTC_79d1a.dir/build
+Building C object CMakeFiles/cmTC_79d1a.dir/src.c.o
+/Users/xingquan.hf/Code/github/public/emsdk/upstream/emscripten/emcc   -DDETECT_SIMD64_C_FLAGS -mavx   -o CMakeFiles/cmTC_79d1a.dir/src.c.o   -c /Users/xingquan.hf/Code/github/fork/videoconverter.js/build/soxr/build/CMakeFiles/CMakeTmp/src.c
+clang-11: warning: argument unused during compilation: '-mavx' [-Wunused-command-line-argument]
+/Users/xingquan.hf/Code/github/fork/videoconverter.js/build/soxr/build/CMakeFiles/CMakeTmp/src.c:3:8: error: 
+      #error
+       ^
+In file included from /Users/xingquan.hf/Code/github/fork/videoconverter.js/build/soxr/build/CMakeFiles/CMakeTmp/src.c:5:
+In file included from /Users/xingquan.hf/Code/github/public/emsdk/upstream/lib/clang/11.0.0/include/immintrin.h:14:
+/Users/xingquan.hf/Code/github/public/emsdk/upstream/lib/clang/11.0.0/include/mmintrin.h:50:12: error: invalid conversion between vector type '__m64' (vector of 1 'long long' value) and integer type 'int' of different size
+    return (__m64)__builtin_ia32_vec_init_v2si(__i, 0);
+           ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/Users/xingquan.hf/Code/github/public/emsdk/upstream/lib/clang/11.0.0/include/mmintrin.h:129:12: error: invalid conversion between vector type '__m64' (vector of 1 'long long' value) and integer type 'int' of different size
+    return (__m64)__builtin_ia32_packsswb((__v4hi)__m1, (__v4hi)__m2);
+           ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/Users/xingquan.hf/Code/github/public/emsdk/upstream/lib/clang/11.0.0/include/mmintrin.h:159:12: error: invalid conversion between vector type '__m64' (vector of 1 'long long' value) and integer type 'int' of different size
+    return (__m64)__builtin_ia32_packssdw((__v2si)__m1, (__v2si)__m2);
+           ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/Users/xingquan.hf/Code/github/public/emsdk/upstream/lib/clang/11.0.0/include/mmintrin.h:189:12: error: invalid conversion between vector type '__m64' (vector of 1 'long long' value) and integer type 'int' of different size
+    return (__m64)__builtin_ia32_packuswb((__v4hi)__m1, (__v4hi)__m2);
+           ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/Users/xingquan.hf/Code/github/public/emsdk/upstream/lib/clang/11.0.0/include/mmintrin.h:216:12: error: invalid conversion between vector type '__m64' (vector of 1 'long long' value) and integer type 'int' of different size
+    return (__m64)__builtin_ia32_punpckhbw((__v8qi)__m1, (__v8qi)__m2);
+           ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/Users/xingquan.hf/Code/github/public/emsdk/upstream/lib/clang/11.0.0/include/mmintrin.h:239:12: error: invalid conversion between vector type '__m64' (vector of 1 'long long' value) and integer type 'int' of different size
+    return (__m64)__builtin_ia32_punpckhwd((__v4hi)__m1, (__v4hi)__m2);
+           ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/Users/xingquan.hf/Code/github/public/emsdk/upstream/lib/clang/11.0.0/include/mmintrin.h:260:12: error: invalid conversion between vector type '__m64' (vector of 1 'long long' value) and integer type 'int' of different size
+    return (__m64)__builtin_ia32_punpckhdq((__v2si)__m1, (__v2si)__m2);
+           ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/Users/xingquan.hf/Code/github/public/emsdk/upstream/lib/clang/11.0.0/include/mmintrin.h:287:12: error: invalid conversion between vector type '__m64' (vector of 1 'long long' value) and integer type 'int' of different size
+    return (__m64)__builtin_ia32_punpcklbw((__v8qi)__m1, (__v8qi)__m2);
+           ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/Users/xingquan.hf/Code/github/public/emsdk/upstream/lib/clang/11.0.0/include/mmintrin.h:310:12: error: invalid conversion between vector type '__m64' (vector of 1 'long long' value) and integer type 'int' of different size
+    return (__m64)__builtin_ia32_punpcklwd((__v4hi)__m1, (__v4hi)__m2);
+           ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/Users/xingquan.hf/Code/github/public/emsdk/upstream/lib/clang/11.0.0/include/mmintrin.h:331:12: error: invalid conversion between vector type '__m64' (vector of 1 'long long' value) and integer type 'int' of different size
+    return (__m64)__builtin_ia32_punpckldq((__v2si)__m1, (__v2si)__m2);
+           ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/Users/xingquan.hf/Code/github/public/emsdk/upstream/lib/clang/11.0.0/include/mmintrin.h:352:12: error: invalid conversion between vector type '__m64' (vector of 1 'long long' value) and integer type 'int' of different size
+    return (__m64)__builtin_ia32_paddb((__v8qi)__m1, (__v8qi)__m2);
+           ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/Users/xingquan.hf/Code/github/public/emsdk/upstream/lib/clang/11.0.0/include/mmintrin.h:373:12: error: invalid conversion between vector type '__m64' (vector of 1 'long long' value) and integer type 'int' of different size
+    return (__m64)__builtin_ia32_paddw((__v4hi)__m1, (__v4hi)__m2);
+           ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/Users/xingquan.hf/Code/github/public/emsdk/upstream/lib/clang/11.0.0/include/mmintrin.h:394:12: error: invalid conversion between vector type '__m64' (vector of 1 'long long' value) and integer type 'int' of different size
+    return (__m64)__builtin_ia32_paddd((__v2si)__m1, (__v2si)__m2);
+           ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/Users/xingquan.hf/Code/github/public/emsdk/upstream/lib/clang/11.0.0/include/mmintrin.h:416:12: error: invalid conversion between vector type '__m64' (vector of 1 'long long' value) and integer type 'int' of different size
+    return (__m64)__builtin_ia32_paddsb((__v8qi)__m1, (__v8qi)__m2);
+           ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/Users/xingquan.hf/Code/github/public/emsdk/upstream/lib/clang/11.0.0/include/mmintrin.h:439:12: error: invalid conversion between vector type '__m64' (vector of 1 'long long' value) and integer type 'int' of different size
+    return (__m64)__builtin_ia32_paddsw((__v4hi)__m1, (__v4hi)__m2);
+           ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/Users/xingquan.hf/Code/github/public/emsdk/upstream/lib/clang/11.0.0/include/mmintrin.h:461:12: error: invalid conversion between vector type '__m64' (vector of 1 'long long' value) and integer type 'int' of different size
+    return (__m64)__builtin_ia32_paddusb((__v8qi)__m1, (__v8qi)__m2);
+           ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/Users/xingquan.hf/Code/github/public/emsdk/upstream/lib/clang/11.0.0/include/mmintrin.h:483:12: error: invalid conversion between vector type '__m64' (vector of 1 'long long' value) and integer type 'int' of different size
+    return (__m64)__builtin_ia32_paddusw((__v4hi)__m1, (__v4hi)__m2);
+           ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/Users/xingquan.hf/Code/github/public/emsdk/upstream/lib/clang/11.0.0/include/mmintrin.h:504:12: error: invalid conversion between vector type '__m64' (vector of 1 'long long' value) and integer type 'int' of different size
+    return (__m64)__builtin_ia32_psubb((__v8qi)__m1, (__v8qi)__m2);
+           ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+fatal error: too many errors emitted, stopping now [-ferror-limit=]
+20 errors generated.
+emcc: error: '/Users/xingquan.hf/Code/github/public/emsdk/upstream/bin/clang -target wasm32-unknown-emscripten -D__EMSCRIPTEN_major__=1 -D__EMSCRIPTEN_minor__=39 -D__EMSCRIPTEN_tiny__=12 -D_LIBCPP_ABI_VERSION=2 -Dunix -D__unix -D__unix__ -Werror=implicit-function-declaration -Xclang -nostdsysteminc -Xclang -isystem/Users/xingquan.hf/Code/github/public/emsdk/upstream/emscripten/system/include/libcxx -Xclang -isystem/Users/xingquan.hf/Code/github/public/emsdk/upstream/emscripten/system/lib/libcxxabi/include -Xclang -isystem/Users/xingquan.hf/Code/github/public/emsdk/upstream/emscripten/system/lib/libunwind/include -Xclang -isystem/Users/xingquan.hf/Code/github/public/emsdk/upstream/emscripten/system/include/compat -Xclang -isystem/Users/xingquan.hf/Code/github/public/emsdk/upstream/emscripten/system/include -Xclang -isystem/Users/xingquan.hf/Code/github/public/emsdk/upstream/emscripten/system/include/libc -Xclang -isystem/Users/xingquan.hf/Code/github/public/emsdk/upstream/emscripten/system/lib/libc/musl/arch/emscripten -Xclang -isystem/Users/xingquan.hf/Code/github/public/emsdk/upstream/emscripten/system/local/include -Xclang -isystem/Users/xingquan.hf/.emscripten_cache/wasm/include -DDETECT_SIMD64_C_FLAGS -mavx -c -DEMSCRIPTEN -fignore-exceptions /Users/xingquan.hf/Code/github/fork/videoconverter.js/build/soxr/build/CMakeFiles/CMakeTmp/src.c -Xclang -isystem/Users/xingquan.hf/Code/github/public/emsdk/upstream/emscripten/system/include/SDL -c -o CMakeFiles/cmTC_79d1a.dir/src.c.o -mllvm -combiner-global-alias-analysis=false -mllvm -enable-emscripten-sjlj -mllvm -disable-lsr' failed (1)
+make[1]: *** [CMakeFiles/cmTC_79d1a.dir/src.c.o] Error 1
+make: *** [cmTC_79d1a/fast] Error 2
+
+
+Source file was:
+
+    #ifndef __AVX__
+      #error
+    #endif
+    #include <immintrin.h>
+    int main() {return 0;}
+    
+Performing C SOURCE FILE Test DETECT_SIMD64_C_FLAGS failed with the following output:
+Change Dir: /Users/xingquan.hf/Code/github/fork/videoconverter.js/build/soxr/build/CMakeFiles/CMakeTmp
+
+Run Build Command(s):/usr/bin/make cmTC_d80d4/fast && /Library/Developer/CommandLineTools/usr/bin/make -f CMakeFiles/cmTC_d80d4.dir/build.make CMakeFiles/cmTC_d80d4.dir/build
+Building C object CMakeFiles/cmTC_d80d4.dir/src.c.o
+/Users/xingquan.hf/Code/github/public/emsdk/upstream/emscripten/emcc   -DDETECT_SIMD64_C_FLAGS /arch:AVX   -o CMakeFiles/cmTC_d80d4.dir/src.c.o   -c /Users/xingquan.hf/Code/github/fork/videoconverter.js/build/soxr/build/CMakeFiles/CMakeTmp/src.c
+emcc: error: /arch:AVX: No such file or directory ("/arch:AVX" was expected to be an input file, based on the commandline arguments provided)
+make[1]: *** [CMakeFiles/cmTC_d80d4.dir/src.c.o] Error 1
+make: *** [cmTC_d80d4/fast] Error 2
+
+
+Source file was:
+
+    #ifndef __AVX__
+      #error
+    #endif
+    #include <immintrin.h>
+    int main() {return 0;}
+    

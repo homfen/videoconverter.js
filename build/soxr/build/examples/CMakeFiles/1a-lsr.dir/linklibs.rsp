@@ -1,0 +1,1 @@
+ ../src/libsoxr.a -lm ../src/libsoxr-lsr.a ../src/libsoxr.a -lm 

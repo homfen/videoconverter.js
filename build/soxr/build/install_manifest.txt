@@ -1,0 +1,17 @@
+/Users/xingquan.hf/Code/github/fork/videoconverter.js/build/soxr/build/../../dist/share/doc/libsoxr/README
+/Users/xingquan.hf/Code/github/fork/videoconverter.js/build/soxr/build/../../dist/share/doc/libsoxr/LICENCE
+/Users/xingquan.hf/Code/github/fork/videoconverter.js/build/soxr/build/../../dist/share/doc/libsoxr/NEWS
+/Users/xingquan.hf/Code/github/fork/videoconverter.js/build/soxr/build/../../dist/lib/pkgconfig/soxr.pc
+/Users/xingquan.hf/Code/github/fork/videoconverter.js/build/soxr/build/../../dist/lib/pkgconfig/soxr-lsr.pc
+/Users/xingquan.hf/Code/github/fork/videoconverter.js/build/soxr/build/../../dist/lib/libsoxr.a
+/Users/xingquan.hf/Code/github/fork/videoconverter.js/build/soxr/build/../../dist/include/soxr.h
+/Users/xingquan.hf/Code/github/fork/videoconverter.js/build/soxr/build/../../dist/lib/libsoxr-lsr.a
+/Users/xingquan.hf/Code/github/fork/videoconverter.js/build/soxr/build/../../dist/include/soxr-lsr.h
+/Users/xingquan.hf/Code/github/fork/videoconverter.js/build/soxr/build/../../dist/share/doc/libsoxr/examples/1-single-block.c
+/Users/xingquan.hf/Code/github/fork/videoconverter.js/build/soxr/build/../../dist/share/doc/libsoxr/examples/1a-lsr.c
+/Users/xingquan.hf/Code/github/fork/videoconverter.js/build/soxr/build/../../dist/share/doc/libsoxr/examples/2-stream.C
+/Users/xingquan.hf/Code/github/fork/videoconverter.js/build/soxr/build/../../dist/share/doc/libsoxr/examples/3-options-input-fn.c
+/Users/xingquan.hf/Code/github/fork/videoconverter.js/build/soxr/build/../../dist/share/doc/libsoxr/examples/4-split-channels.c
+/Users/xingquan.hf/Code/github/fork/videoconverter.js/build/soxr/build/../../dist/share/doc/libsoxr/examples/5-variable-rate.c
+/Users/xingquan.hf/Code/github/fork/videoconverter.js/build/soxr/build/../../dist/share/doc/libsoxr/examples/examples-common.h
+/Users/xingquan.hf/Code/github/fork/videoconverter.js/build/soxr/build/../../dist/share/doc/libsoxr/examples/README

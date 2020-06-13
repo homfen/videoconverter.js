@@ -1,0 +1,1 @@
+/Library/Developer/CommandLineTools/usr/bin/cc   -O3 -DNDEBUG -isysroot /Library/Developer/CommandLineTools/SDKs/MacOSX10.15.sdk -Wl,-search_paths_first -Wl,-headerpad_max_install_names  CMakeFiles/1-delay-clear.dir/1-delay-clear.c.o  -o 1-delay-clear  -Wl,-rpath,/Users/xingquan.hf/Code/github/fork/videoconverter.js/build/soxr/Release/src ../src/libsoxr.0.1.2.dylib -lm 

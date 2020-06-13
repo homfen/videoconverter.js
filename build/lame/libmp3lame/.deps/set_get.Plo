@@ -1,0 +1,158 @@
+set_get.lo: set_get.c ../config.h ../include/lame.h \
+  /Users/xingquan.hf/Code/github/public/emsdk/upstream/emscripten/system/include/libcxx/stddef.h \
+  /Users/xingquan.hf/Code/github/public/emsdk/upstream/emscripten/system/include/libcxx/__config \
+  /Users/xingquan.hf/Code/github/public/emsdk/upstream/emscripten/system/include/libc/stddef.h \
+  /Users/xingquan.hf/Code/github/public/emsdk/upstream/emscripten/system/lib/libc/musl/arch/emscripten/bits/alltypes.h \
+  /Users/xingquan.hf/Code/github/public/emsdk/upstream/emscripten/system/include/compat/stdarg.h \
+  /Users/xingquan.hf/Code/github/public/emsdk/upstream/emscripten/system/include/libc/stdarg.h \
+  /Users/xingquan.hf/Code/github/public/emsdk/upstream/emscripten/system/include/libcxx/stdio.h \
+  /Users/xingquan.hf/Code/github/public/emsdk/upstream/emscripten/system/include/libc/stdio.h \
+  /Users/xingquan.hf/Code/github/public/emsdk/upstream/emscripten/system/include/wasi/api.h \
+  /Users/xingquan.hf/Code/github/public/emsdk/upstream/emscripten/system/include/libcxx/stdint.h \
+  /Users/xingquan.hf/Code/github/public/emsdk/upstream/emscripten/system/include/libc/stdint.h \
+  /Users/xingquan.hf/Code/github/public/emsdk/upstream/emscripten/system/lib/libc/musl/arch/emscripten/bits/stdint.h \
+  /Users/xingquan.hf/Code/github/public/emsdk/upstream/emscripten/system/include/libc/features.h \
+  machine.h version.h \
+  /Users/xingquan.hf/Code/github/public/emsdk/upstream/emscripten/system/include/libc/assert.h \
+  /Users/xingquan.hf/Code/github/public/emsdk/upstream/emscripten/system/include/libcxx/stdlib.h \
+  /Users/xingquan.hf/Code/github/public/emsdk/upstream/emscripten/system/include/compat/stdlib.h \
+  /Users/xingquan.hf/Code/github/public/emsdk/upstream/emscripten/system/include/libc/stdlib.h \
+  /Users/xingquan.hf/Code/github/public/emsdk/upstream/emscripten/system/include/libc/alloca.h \
+  /Users/xingquan.hf/Code/github/public/emsdk/upstream/emscripten/system/include/libcxx/string.h \
+  /Users/xingquan.hf/Code/github/public/emsdk/upstream/emscripten/system/include/compat/string.h \
+  /Users/xingquan.hf/Code/github/public/emsdk/upstream/emscripten/system/include/libc/string.h \
+  /Users/xingquan.hf/Code/github/public/emsdk/upstream/emscripten/system/include/libc/strings.h \
+  /Users/xingquan.hf/Code/github/public/emsdk/upstream/emscripten/system/include/libcxx/math.h \
+  /Users/xingquan.hf/Code/github/public/emsdk/upstream/emscripten/system/include/compat/math.h \
+  /Users/xingquan.hf/Code/github/public/emsdk/upstream/emscripten/system/include/libc/math.h \
+  /Users/xingquan.hf/Code/github/public/emsdk/upstream/emscripten/system/include/libcxx/limits.h \
+  /Users/xingquan.hf/Code/github/public/emsdk/upstream/emscripten/system/include/libc/limits.h \
+  /Users/xingquan.hf/Code/github/public/emsdk/upstream/emscripten/system/lib/libc/musl/arch/emscripten/bits/limits.h \
+  /Users/xingquan.hf/Code/github/public/emsdk/upstream/emscripten/system/include/libcxx/ctype.h \
+  /Users/xingquan.hf/Code/github/public/emsdk/upstream/emscripten/system/include/compat/ctype.h \
+  /Users/xingquan.hf/Code/github/public/emsdk/upstream/emscripten/system/include/libc/ctype.h \
+  /Users/xingquan.hf/Code/github/public/emsdk/upstream/emscripten/system/include/libcxx/errno.h \
+  /Users/xingquan.hf/Code/github/public/emsdk/upstream/emscripten/system/include/libc/errno.h \
+  /Users/xingquan.hf/Code/github/public/emsdk/upstream/emscripten/system/lib/libc/musl/arch/emscripten/bits/errno.h \
+  /Users/xingquan.hf/Code/github/public/emsdk/upstream/emscripten/system/include/libc/fcntl.h \
+  /Users/xingquan.hf/Code/github/public/emsdk/upstream/emscripten/system/lib/libc/musl/arch/emscripten/bits/fcntl.h \
+  /Users/xingquan.hf/Code/github/public/emsdk/upstream/emscripten/system/include/libc/sys/types.h \
+  /Users/xingquan.hf/Code/github/public/emsdk/upstream/emscripten/system/include/libc/endian.h \
+  /Users/xingquan.hf/Code/github/public/emsdk/upstream/emscripten/system/include/libc/sys/select.h \
+  /Users/xingquan.hf/Code/github/public/emsdk/upstream/emscripten/system/include/compat/sys/stat.h \
+  /Users/xingquan.hf/Code/github/public/emsdk/upstream/emscripten/system/include/libc/sys/stat.h \
+  /Users/xingquan.hf/Code/github/public/emsdk/upstream/emscripten/system/lib/libc/musl/arch/emscripten/bits/stat.h \
+  /Users/xingquan.hf/Code/github/public/emsdk/upstream/emscripten/system/include/libcxx/inttypes.h \
+  /Users/xingquan.hf/Code/github/public/emsdk/upstream/emscripten/system/include/libc/inttypes.h \
+  encoder.h util.h l3side.h id3tag.h lame_global_flags.h bitstream.h \
+  set_get.h
+
+../config.h:
+
+../include/lame.h:
+
+/Users/xingquan.hf/Code/github/public/emsdk/upstream/emscripten/system/include/libcxx/stddef.h:
+
+/Users/xingquan.hf/Code/github/public/emsdk/upstream/emscripten/system/include/libcxx/__config:
+
+/Users/xingquan.hf/Code/github/public/emsdk/upstream/emscripten/system/include/libc/stddef.h:
+
+/Users/xingquan.hf/Code/github/public/emsdk/upstream/emscripten/system/lib/libc/musl/arch/emscripten/bits/alltypes.h:
+
+/Users/xingquan.hf/Code/github/public/emsdk/upstream/emscripten/system/include/compat/stdarg.h:
+
+/Users/xingquan.hf/Code/github/public/emsdk/upstream/emscripten/system/include/libc/stdarg.h:
+
+/Users/xingquan.hf/Code/github/public/emsdk/upstream/emscripten/system/include/libcxx/stdio.h:
+
+/Users/xingquan.hf/Code/github/public/emsdk/upstream/emscripten/system/include/libc/stdio.h:
+
+/Users/xingquan.hf/Code/github/public/emsdk/upstream/emscripten/system/include/wasi/api.h:
+
+/Users/xingquan.hf/Code/github/public/emsdk/upstream/emscripten/system/include/libcxx/stdint.h:
+
+/Users/xingquan.hf/Code/github/public/emsdk/upstream/emscripten/system/include/libc/stdint.h:
+
+/Users/xingquan.hf/Code/github/public/emsdk/upstream/emscripten/system/lib/libc/musl/arch/emscripten/bits/stdint.h:
+
+/Users/xingquan.hf/Code/github/public/emsdk/upstream/emscripten/system/include/libc/features.h:
+
+machine.h:
+
+version.h:
+
+/Users/xingquan.hf/Code/github/public/emsdk/upstream/emscripten/system/include/libc/assert.h:
+
+/Users/xingquan.hf/Code/github/public/emsdk/upstream/emscripten/system/include/libcxx/stdlib.h:
+
+/Users/xingquan.hf/Code/github/public/emsdk/upstream/emscripten/system/include/compat/stdlib.h:
+
+/Users/xingquan.hf/Code/github/public/emsdk/upstream/emscripten/system/include/libc/stdlib.h:
+
+/Users/xingquan.hf/Code/github/public/emsdk/upstream/emscripten/system/include/libc/alloca.h:
+
+/Users/xingquan.hf/Code/github/public/emsdk/upstream/emscripten/system/include/libcxx/string.h:
+
+/Users/xingquan.hf/Code/github/public/emsdk/upstream/emscripten/system/include/compat/string.h:
+
+/Users/xingquan.hf/Code/github/public/emsdk/upstream/emscripten/system/include/libc/string.h:
+
+/Users/xingquan.hf/Code/github/public/emsdk/upstream/emscripten/system/include/libc/strings.h:
+
+/Users/xingquan.hf/Code/github/public/emsdk/upstream/emscripten/system/include/libcxx/math.h:
+
+/Users/xingquan.hf/Code/github/public/emsdk/upstream/emscripten/system/include/compat/math.h:
+
+/Users/xingquan.hf/Code/github/public/emsdk/upstream/emscripten/system/include/libc/math.h:
+
+/Users/xingquan.hf/Code/github/public/emsdk/upstream/emscripten/system/include/libcxx/limits.h:
+
+/Users/xingquan.hf/Code/github/public/emsdk/upstream/emscripten/system/include/libc/limits.h:
+
+/Users/xingquan.hf/Code/github/public/emsdk/upstream/emscripten/system/lib/libc/musl/arch/emscripten/bits/limits.h:
+
+/Users/xingquan.hf/Code/github/public/emsdk/upstream/emscripten/system/include/libcxx/ctype.h:
+
+/Users/xingquan.hf/Code/github/public/emsdk/upstream/emscripten/system/include/compat/ctype.h:
+
+/Users/xingquan.hf/Code/github/public/emsdk/upstream/emscripten/system/include/libc/ctype.h:
+
+/Users/xingquan.hf/Code/github/public/emsdk/upstream/emscripten/system/include/libcxx/errno.h:
+
+/Users/xingquan.hf/Code/github/public/emsdk/upstream/emscripten/system/include/libc/errno.h:
+
+/Users/xingquan.hf/Code/github/public/emsdk/upstream/emscripten/system/lib/libc/musl/arch/emscripten/bits/errno.h:
+
+/Users/xingquan.hf/Code/github/public/emsdk/upstream/emscripten/system/include/libc/fcntl.h:
+
+/Users/xingquan.hf/Code/github/public/emsdk/upstream/emscripten/system/lib/libc/musl/arch/emscripten/bits/fcntl.h:
+
+/Users/xingquan.hf/Code/github/public/emsdk/upstream/emscripten/system/include/libc/sys/types.h:
+
+/Users/xingquan.hf/Code/github/public/emsdk/upstream/emscripten/system/include/libc/endian.h:
+
+/Users/xingquan.hf/Code/github/public/emsdk/upstream/emscripten/system/include/libc/sys/select.h:
+
+/Users/xingquan.hf/Code/github/public/emsdk/upstream/emscripten/system/include/compat/sys/stat.h:
+
+/Users/xingquan.hf/Code/github/public/emsdk/upstream/emscripten/system/include/libc/sys/stat.h:
+
+/Users/xingquan.hf/Code/github/public/emsdk/upstream/emscripten/system/lib/libc/musl/arch/emscripten/bits/stat.h:
+
+/Users/xingquan.hf/Code/github/public/emsdk/upstream/emscripten/system/include/libcxx/inttypes.h:
+
+/Users/xingquan.hf/Code/github/public/emsdk/upstream/emscripten/system/include/libc/inttypes.h:
+
+encoder.h:
+
+util.h:
+
+l3side.h:
+
+id3tag.h:
+
+lame_global_flags.h:
+
+bitstream.h:
+
+set_get.h:

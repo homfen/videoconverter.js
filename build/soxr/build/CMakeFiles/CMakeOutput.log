@@ -1,0 +1,90 @@
+The target system is: Emscripten - 1 - x86
+The host system is: Darwin - 19.4.0 - x86_64
+Determining if the function pow exists in the m passed with the following output:
+Change Dir: /Users/xingquan.hf/Code/github/fork/videoconverter.js/build/soxr/build/CMakeFiles/CMakeTmp
+
+Run Build Command(s):/usr/bin/make cmTC_66ad4/fast && /Library/Developer/CommandLineTools/usr/bin/make -f CMakeFiles/cmTC_66ad4.dir/build.make CMakeFiles/cmTC_66ad4.dir/build
+Building C object CMakeFiles/cmTC_66ad4.dir/CheckFunctionExists.c.o
+/Users/xingquan.hf/Code/github/public/emsdk/upstream/emscripten/emcc   -DCHECK_FUNCTION_EXISTS=pow   -o CMakeFiles/cmTC_66ad4.dir/CheckFunctionExists.c.o   -c /usr/local/Cellar/cmake/3.16.4/share/cmake/Modules/CheckFunctionExists.c
+/usr/local/Cellar/cmake/3.16.4/share/cmake/Modules/CheckFunctionExists.c:7:3: warning: incompatible redeclaration of library function 'pow' [-Wincompatible-library-redeclaration]
+  CHECK_FUNCTION_EXISTS(void);
+  ^
+<command line>:8:31: note: expanded from here
+#define CHECK_FUNCTION_EXISTS pow
+                              ^
+/usr/local/Cellar/cmake/3.16.4/share/cmake/Modules/CheckFunctionExists.c:7:3: note: 'pow' is a builtin with type 'double (double, double)'
+<command line>:8:31: note: expanded from here
+#define CHECK_FUNCTION_EXISTS pow
+                              ^
+1 warning generated.
+Linking C executable cmTC_66ad4.js
+/usr/local/Cellar/cmake/3.16.4/bin/cmake -E cmake_link_script CMakeFiles/cmTC_66ad4.dir/link.txt --verbose=1
+/Users/xingquan.hf/Code/github/public/emsdk/upstream/emscripten/emcc  -DCHECK_FUNCTION_EXISTS=pow    @CMakeFiles/cmTC_66ad4.dir/objects1.rsp  -o cmTC_66ad4.js @CMakeFiles/cmTC_66ad4.dir/linklibs.rsp
+wasm-ld: warning: function signature mismatch: pow
+>>> defined as () -> i32 in CMakeFiles/cmTC_66ad4.dir/CheckFunctionExists.c.o
+>>> defined as (f64, f64) -> f64 in /Users/xingquan.hf/.emscripten_cache/wasm/libc-wasm.a(pow.c.o)
+
+
+
+Determining if the function lrint exists passed with the following output:
+Change Dir: /Users/xingquan.hf/Code/github/fork/videoconverter.js/build/soxr/build/CMakeFiles/CMakeTmp
+
+Run Build Command(s):/usr/bin/make cmTC_c48ed/fast && /Library/Developer/CommandLineTools/usr/bin/make -f CMakeFiles/cmTC_c48ed.dir/build.make CMakeFiles/cmTC_c48ed.dir/build
+Building C object CMakeFiles/cmTC_c48ed.dir/CheckFunctionExists.c.o
+/Users/xingquan.hf/Code/github/public/emsdk/upstream/emscripten/emcc   -DCHECK_FUNCTION_EXISTS=lrint   -o CMakeFiles/cmTC_c48ed.dir/CheckFunctionExists.c.o   -c /usr/local/Cellar/cmake/3.16.4/share/cmake/Modules/CheckFunctionExists.c
+/usr/local/Cellar/cmake/3.16.4/share/cmake/Modules/CheckFunctionExists.c:7:3: warning: incompatible redeclaration of library function 'lrint' [-Wincompatible-library-redeclaration]
+  CHECK_FUNCTION_EXISTS(void);
+  ^
+<command line>:8:31: note: expanded from here
+#define CHECK_FUNCTION_EXISTS lrint
+                              ^
+/usr/local/Cellar/cmake/3.16.4/share/cmake/Modules/CheckFunctionExists.c:7:3: note: 'lrint' is a builtin with type 'long (double)'
+<command line>:8:31: note: expanded from here
+#define CHECK_FUNCTION_EXISTS lrint
+                              ^
+1 warning generated.
+Linking C executable cmTC_c48ed.js
+/usr/local/Cellar/cmake/3.16.4/bin/cmake -E cmake_link_script CMakeFiles/cmTC_c48ed.dir/link.txt --verbose=1
+/Users/xingquan.hf/Code/github/public/emsdk/upstream/emscripten/emcc  -DCHECK_FUNCTION_EXISTS=lrint    @CMakeFiles/cmTC_c48ed.dir/objects1.rsp  -o cmTC_c48ed.js @CMakeFiles/cmTC_c48ed.dir/linklibs.rsp
+wasm-ld: warning: function signature mismatch: lrint
+>>> defined as () -> i32 in CMakeFiles/cmTC_c48ed.dir/CheckFunctionExists.c.o
+>>> defined as (f64) -> i32 in /Users/xingquan.hf/.emscripten_cache/wasm/libc.a(lrint.c.o)
+
+
+
+Determining if files fenv.h exist passed with the following output:
+Change Dir: /Users/xingquan.hf/Code/github/fork/videoconverter.js/build/soxr/build/CMakeFiles/CMakeTmp
+
+Run Build Command(s):/usr/bin/make cmTC_e14e5/fast && /Library/Developer/CommandLineTools/usr/bin/make -f CMakeFiles/cmTC_e14e5.dir/build.make CMakeFiles/cmTC_e14e5.dir/build
+Building C object CMakeFiles/cmTC_e14e5.dir/HAVE_FENV_H.c.o
+/Users/xingquan.hf/Code/github/public/emsdk/upstream/emscripten/emcc    -o CMakeFiles/cmTC_e14e5.dir/HAVE_FENV_H.c.o   -c /Users/xingquan.hf/Code/github/fork/videoconverter.js/build/soxr/build/CMakeFiles/CheckIncludeFiles/HAVE_FENV_H.c
+Linking C executable cmTC_e14e5.js
+/usr/local/Cellar/cmake/3.16.4/bin/cmake -E cmake_link_script CMakeFiles/cmTC_e14e5.dir/link.txt --verbose=1
+/Users/xingquan.hf/Code/github/public/emsdk/upstream/emscripten/emcc      @CMakeFiles/cmTC_e14e5.dir/objects1.rsp  -o cmTC_e14e5.js 
+
+
+
+Determining if files stdbool.h exist passed with the following output:
+Change Dir: /Users/xingquan.hf/Code/github/fork/videoconverter.js/build/soxr/build/CMakeFiles/CMakeTmp
+
+Run Build Command(s):/usr/bin/make cmTC_48827/fast && /Library/Developer/CommandLineTools/usr/bin/make -f CMakeFiles/cmTC_48827.dir/build.make CMakeFiles/cmTC_48827.dir/build
+Building C object CMakeFiles/cmTC_48827.dir/HAVE_STDBOOL_H.c.o
+/Users/xingquan.hf/Code/github/public/emsdk/upstream/emscripten/emcc    -o CMakeFiles/cmTC_48827.dir/HAVE_STDBOOL_H.c.o   -c /Users/xingquan.hf/Code/github/fork/videoconverter.js/build/soxr/build/CMakeFiles/CheckIncludeFiles/HAVE_STDBOOL_H.c
+Linking C executable cmTC_48827.js
+/usr/local/Cellar/cmake/3.16.4/bin/cmake -E cmake_link_script CMakeFiles/cmTC_48827.dir/link.txt --verbose=1
+/Users/xingquan.hf/Code/github/public/emsdk/upstream/emscripten/emcc      @CMakeFiles/cmTC_48827.dir/objects1.rsp  -o cmTC_48827.js 
+
+
+
+Determining if files stdint.h exist passed with the following output:
+Change Dir: /Users/xingquan.hf/Code/github/fork/videoconverter.js/build/soxr/build/CMakeFiles/CMakeTmp
+
+Run Build Command(s):/usr/bin/make cmTC_36278/fast && /Library/Developer/CommandLineTools/usr/bin/make -f CMakeFiles/cmTC_36278.dir/build.make CMakeFiles/cmTC_36278.dir/build
+Building C object CMakeFiles/cmTC_36278.dir/HAVE_STDINT_H.c.o
+/Users/xingquan.hf/Code/github/public/emsdk/upstream/emscripten/emcc    -o CMakeFiles/cmTC_36278.dir/HAVE_STDINT_H.c.o   -c /Users/xingquan.hf/Code/github/fork/videoconverter.js/build/soxr/build/CMakeFiles/CheckIncludeFiles/HAVE_STDINT_H.c
+Linking C executable cmTC_36278.js
+/usr/local/Cellar/cmake/3.16.4/bin/cmake -E cmake_link_script CMakeFiles/cmTC_36278.dir/link.txt --verbose=1
+/Users/xingquan.hf/Code/github/public/emsdk/upstream/emscripten/emcc      @CMakeFiles/cmTC_36278.dir/objects1.rsp  -o cmTC_36278.js 
+
+
+

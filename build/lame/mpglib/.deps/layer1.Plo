@@ -1,0 +1,99 @@
+layer1.lo: layer1.c ../config.h \
+  /Users/xingquan.hf/Code/github/public/emsdk/upstream/emscripten/system/include/libc/assert.h \
+  /Users/xingquan.hf/Code/github/public/emsdk/upstream/emscripten/system/include/libc/features.h \
+  common.h mpg123.h \
+  /Users/xingquan.hf/Code/github/public/emsdk/upstream/emscripten/system/include/libcxx/stdio.h \
+  /Users/xingquan.hf/Code/github/public/emsdk/upstream/emscripten/system/include/libcxx/__config \
+  /Users/xingquan.hf/Code/github/public/emsdk/upstream/emscripten/system/include/libc/stdio.h \
+  /Users/xingquan.hf/Code/github/public/emsdk/upstream/emscripten/system/include/wasi/api.h \
+  /Users/xingquan.hf/Code/github/public/emsdk/upstream/emscripten/system/include/libcxx/stddef.h \
+  /Users/xingquan.hf/Code/github/public/emsdk/upstream/emscripten/system/include/libc/stddef.h \
+  /Users/xingquan.hf/Code/github/public/emsdk/upstream/emscripten/system/lib/libc/musl/arch/emscripten/bits/alltypes.h \
+  /Users/xingquan.hf/Code/github/public/emsdk/upstream/emscripten/system/include/libcxx/stdint.h \
+  /Users/xingquan.hf/Code/github/public/emsdk/upstream/emscripten/system/include/libc/stdint.h \
+  /Users/xingquan.hf/Code/github/public/emsdk/upstream/emscripten/system/lib/libc/musl/arch/emscripten/bits/stdint.h \
+  /Users/xingquan.hf/Code/github/public/emsdk/upstream/emscripten/system/include/libcxx/string.h \
+  /Users/xingquan.hf/Code/github/public/emsdk/upstream/emscripten/system/include/compat/string.h \
+  /Users/xingquan.hf/Code/github/public/emsdk/upstream/emscripten/system/include/libc/string.h \
+  /Users/xingquan.hf/Code/github/public/emsdk/upstream/emscripten/system/include/libc/strings.h \
+  /Users/xingquan.hf/Code/github/public/emsdk/upstream/emscripten/system/include/libc/signal.h \
+  /Users/xingquan.hf/Code/github/public/emsdk/upstream/emscripten/system/lib/libc/musl/arch/emscripten/bits/signal.h \
+  /Users/xingquan.hf/Code/github/public/emsdk/upstream/emscripten/system/include/libcxx/math.h \
+  /Users/xingquan.hf/Code/github/public/emsdk/upstream/emscripten/system/include/libcxx/stdlib.h \
+  /Users/xingquan.hf/Code/github/public/emsdk/upstream/emscripten/system/include/compat/stdlib.h \
+  /Users/xingquan.hf/Code/github/public/emsdk/upstream/emscripten/system/include/libc/stdlib.h \
+  /Users/xingquan.hf/Code/github/public/emsdk/upstream/emscripten/system/include/libc/alloca.h \
+  /Users/xingquan.hf/Code/github/public/emsdk/upstream/emscripten/system/include/compat/math.h \
+  /Users/xingquan.hf/Code/github/public/emsdk/upstream/emscripten/system/include/libc/math.h \
+  mpglib.h ../include/lame.h \
+  /Users/xingquan.hf/Code/github/public/emsdk/upstream/emscripten/system/include/compat/stdarg.h \
+  /Users/xingquan.hf/Code/github/public/emsdk/upstream/emscripten/system/include/libc/stdarg.h \
+  decode_i386.h layer1.h
+
+../config.h:
+
+/Users/xingquan.hf/Code/github/public/emsdk/upstream/emscripten/system/include/libc/assert.h:
+
+/Users/xingquan.hf/Code/github/public/emsdk/upstream/emscripten/system/include/libc/features.h:
+
+common.h:
+
+mpg123.h:
+
+/Users/xingquan.hf/Code/github/public/emsdk/upstream/emscripten/system/include/libcxx/stdio.h:
+
+/Users/xingquan.hf/Code/github/public/emsdk/upstream/emscripten/system/include/libcxx/__config:
+
+/Users/xingquan.hf/Code/github/public/emsdk/upstream/emscripten/system/include/libc/stdio.h:
+
+/Users/xingquan.hf/Code/github/public/emsdk/upstream/emscripten/system/include/wasi/api.h:
+
+/Users/xingquan.hf/Code/github/public/emsdk/upstream/emscripten/system/include/libcxx/stddef.h:
+
+/Users/xingquan.hf/Code/github/public/emsdk/upstream/emscripten/system/include/libc/stddef.h:
+
+/Users/xingquan.hf/Code/github/public/emsdk/upstream/emscripten/system/lib/libc/musl/arch/emscripten/bits/alltypes.h:
+
+/Users/xingquan.hf/Code/github/public/emsdk/upstream/emscripten/system/include/libcxx/stdint.h:
+
+/Users/xingquan.hf/Code/github/public/emsdk/upstream/emscripten/system/include/libc/stdint.h:
+
+/Users/xingquan.hf/Code/github/public/emsdk/upstream/emscripten/system/lib/libc/musl/arch/emscripten/bits/stdint.h:
+
+/Users/xingquan.hf/Code/github/public/emsdk/upstream/emscripten/system/include/libcxx/string.h:
+
+/Users/xingquan.hf/Code/github/public/emsdk/upstream/emscripten/system/include/compat/string.h:
+
+/Users/xingquan.hf/Code/github/public/emsdk/upstream/emscripten/system/include/libc/string.h:
+
+/Users/xingquan.hf/Code/github/public/emsdk/upstream/emscripten/system/include/libc/strings.h:
+
+/Users/xingquan.hf/Code/github/public/emsdk/upstream/emscripten/system/include/libc/signal.h:
+
+/Users/xingquan.hf/Code/github/public/emsdk/upstream/emscripten/system/lib/libc/musl/arch/emscripten/bits/signal.h:
+
+/Users/xingquan.hf/Code/github/public/emsdk/upstream/emscripten/system/include/libcxx/math.h:
+
+/Users/xingquan.hf/Code/github/public/emsdk/upstream/emscripten/system/include/libcxx/stdlib.h:
+
+/Users/xingquan.hf/Code/github/public/emsdk/upstream/emscripten/system/include/compat/stdlib.h:
+
+/Users/xingquan.hf/Code/github/public/emsdk/upstream/emscripten/system/include/libc/stdlib.h:
+
+/Users/xingquan.hf/Code/github/public/emsdk/upstream/emscripten/system/include/libc/alloca.h:
+
+/Users/xingquan.hf/Code/github/public/emsdk/upstream/emscripten/system/include/compat/math.h:
+
+/Users/xingquan.hf/Code/github/public/emsdk/upstream/emscripten/system/include/libc/math.h:
+
+mpglib.h:
+
+../include/lame.h:
+
+/Users/xingquan.hf/Code/github/public/emsdk/upstream/emscripten/system/include/compat/stdarg.h:
+
+/Users/xingquan.hf/Code/github/public/emsdk/upstream/emscripten/system/include/libc/stdarg.h:
+
+decode_i386.h:
+
+layer1.h:

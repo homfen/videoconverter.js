@@ -1,0 +1,1 @@
+/Users/xingquan.hf/Code/github/public/emsdk/upstream/emscripten/emar rc libsoxr-lsr.a  @CMakeFiles/soxr-lsr.dir/objects1.rsp

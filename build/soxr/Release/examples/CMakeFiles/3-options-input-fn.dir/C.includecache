@@ -1,0 +1,42 @@
+#IncludeRegexLine: ^[ 	]*[#%][ 	]*(include|import)[ 	]*[<"]([^">]+)([">])
+
+#IncludeRegexScan: ^.*$
+
+#IncludeRegexComplain: ^$
+
+#IncludeRegexTransform: 
+
+../src/soxr.h
+cstddef
+-
+stddef.h
+-
+
+/Users/xingquan.hf/Code/github/fork/videoconverter.js/build/soxr/examples/3-options-input-fn.c
+soxr.h
+-
+examples-common.h
+/Users/xingquan.hf/Code/github/fork/videoconverter.js/build/soxr/examples/examples-common.h
+
+/Users/xingquan.hf/Code/github/fork/videoconverter.js/build/soxr/examples/examples-common.h
+assert.h
+-
+errno.h
+-
+limits.h
+-
+math.h
+-
+stddef.h
+-
+stdio.h
+-
+stdlib.h
+-
+string.h
+-
+io.h
+-
+fcntl.h
+-
+
